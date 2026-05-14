@@ -381,7 +381,7 @@
         </div>
     </div>
 
-    <!-- Red Separator Line (Now Black per request) -->
+    <!-- Black Separator Line -->
     <hr class="main-separator">
 
     <div id="tableContainer">
@@ -427,7 +427,7 @@
 <script>
     // ==========================================
     // ADD YOUR IMGBB API KEY HERE TO ENABLE IMAGES IN SHARE LINKS
-    const IMGBB_API_KEY = "c2bdac3065be1e1346bdb440b2287d48"; 
+    const IMGBB_API_KEY = ""; 
     // ==========================================
 
     // --- STATE VARIABLES ---
@@ -899,66 +899,75 @@
         calculate();
     }
 
-    // --- GITHUB-OPTIMIZED URL SHORTENER ---
+    // --- URL SHORTENER INTEGRATION (spoo.me via POST with Custom Alias) ---
     async function generateShareLink(makeViewOnly = false) {
         // 1. Ask for a custom name
-        let customAlias = prompt("Enter a custom link name (optional).\ne.g., 'Aura_Project_May'\n\nLeave blank for a random short link.", "");
+        let customAlias = prompt("Enter a custom link name (optional).\nLeave blank for a random short link.\n\nNote: Custom names must be globally unique (e.g., 'Aura_Eden_May2026'). Spaces and special characters will be removed.", "");
         
         if (customAlias === null) return; 
+
         customAlias = customAlias.replace(/[^a-zA-Z0-9_]/g, '');
 
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
         
+        const originalData = extractCurrentProjectData(false);
+        const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
+        
         const btn = makeViewOnly ? document.getElementById('shareViewBtn') : document.getElementById('shareBtn');
         const originalText = btn.innerHTML;
+        
         btn.innerHTML = "⏳ Generating...";
 
         try {
             const encodedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-            
-            // NEW GITHUB LOGIC: This ensures the link always points to your index.html correctly
-            const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
-            
+            const baseUrl = window.location.href.split('?')[0]; 
             const viewParam = makeViewOnly ? "&view=1" : "";
             const longUrl = baseUrl + "?data=" + encodedData + viewParam;
             
             let finalUrl = longUrl;
 
-            // Shorten via is.gd (Immediate redirect, no preview screens)
+            // Attempt to shorten via spoo.me API using POST (more reliable for long URLs)
             try {
-                let apiUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`;
-                if (customAlias) apiUrl += `&shorturl=${encodeURIComponent(customAlias)}`;
+                let bodyData = new URLSearchParams();
+                bodyData.append('url', longUrl);
+                if (customAlias) {
+                    bodyData.append('alias', customAlias);
+                }
 
-                finalUrl = await new Promise((resolve, reject) => {
-                    const callbackName = 'isgd_callback_' + Math.round(100000 * Math.random());
-                    window[callbackName] = function(data) {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        if (data.shorturl) resolve(data.shorturl);
-                        else reject(new Error(data.errormessage || "Name already taken."));
-                    };
-                    const script = document.createElement('script');
-                    script.src = `${apiUrl}&callback=${callbackName}`;
-                    script.onerror = () => reject(new Error("Connection failed."));
-                    document.body.appendChild(script);
-                    setTimeout(() => reject(new Error("Timeout")), 7000);
+                const response = await fetch('https://spoo.me/', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: bodyData.toString()
                 });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    finalUrl = data.short_url;
+                } else {
+                    console.warn("Shortener rejected request. Falling back to long URL.");
+                }
             } catch (apiErr) {
-                alert(`Shortener Error: ${apiErr.message}\n\nFalling back to long URL...`);
-                finalUrl = longUrl; 
+                console.warn("Network error connecting to shortener:", apiErr);
             }
             
             navigator.clipboard.writeText(finalUrl).then(() => {
                 btn.innerHTML = "✅ Link Copied!";
                 btn.style.backgroundColor = "var(--ios-green)"; btn.style.color = "white";
+                
                 setTimeout(() => { 
                     btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
+                    if (hasExcludedImages) {
+                        alert("Notice: A heavy image was detected in your project. It was safely removed from the link to prevent crashes. (Add an ImgBB API Key in the code to share images via cloud links!)");
+                    }
                 }, 2000);
             });
         } catch (err) { 
             btn.innerHTML = originalText;
-            alert("Error: The project data might be too large for a single link."); 
+            alert("Error creating share link. The project data might be too large."); 
         }
     }
 
