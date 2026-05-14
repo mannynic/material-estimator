@@ -899,76 +899,66 @@
         calculate();
     }
 
-    // --- URL SHORTENER INTEGRATION (is.gd with JSONP) ---
+    // --- GITHUB-OPTIMIZED URL SHORTENER ---
     async function generateShareLink(makeViewOnly = false) {
+        // 1. Ask for a custom name
+        let customAlias = prompt("Enter a custom link name (optional).\ne.g., 'Aura_Project_May'\n\nLeave blank for a random short link.", "");
+        
+        if (customAlias === null) return; 
+        customAlias = customAlias.replace(/[^a-zA-Z0-9_]/g, '');
+
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
         
-        const originalData = extractCurrentProjectData(false);
-        const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
-        
         const btn = makeViewOnly ? document.getElementById('shareViewBtn') : document.getElementById('shareBtn');
         const originalText = btn.innerHTML;
-        
-        // Show loading state
         btn.innerHTML = "⏳ Generating...";
 
         try {
             const encodedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-            const baseUrl = window.location.href.split('?')[0]; 
+            
+            // NEW GITHUB LOGIC: This ensures the link always points to your index.html correctly
+            const baseUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+            
             const viewParam = makeViewOnly ? "&view=1" : "";
             const longUrl = baseUrl + "?data=" + encodedData + viewParam;
             
             let finalUrl = longUrl;
 
-            // Attempt to shorten the URL via is.gd API (Using JSONP to bypass CORS)
+            // Shorten via is.gd (Immediate redirect, no preview screens)
             try {
+                let apiUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`;
+                if (customAlias) apiUrl += `&shorturl=${encodeURIComponent(customAlias)}`;
+
                 finalUrl = await new Promise((resolve, reject) => {
                     const callbackName = 'isgd_callback_' + Math.round(100000 * Math.random());
-                    
                     window[callbackName] = function(data) {
                         delete window[callbackName];
                         document.body.removeChild(script);
-                        if (data.shorturl) {
-                            resolve(data.shorturl);
-                        } else {
-                            reject(new Error(data.errormessage || "Unknown error"));
-                        }
+                        if (data.shorturl) resolve(data.shorturl);
+                        else reject(new Error(data.errormessage || "Name already taken."));
                     };
-
                     const script = document.createElement('script');
-                    script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${callbackName}`;
-                    
-                    script.onerror = () => {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        reject(new Error("Script load failed"));
-                    };
-                    
+                    script.src = `${apiUrl}&callback=${callbackName}`;
+                    script.onerror = () => reject(new Error("Connection failed."));
                     document.body.appendChild(script);
-                    
-                    // Fallback timeout just in case it hangs
-                    setTimeout(() => reject(new Error("Timeout")), 5000);
+                    setTimeout(() => reject(new Error("Timeout")), 7000);
                 });
             } catch (apiErr) {
-                console.warn("URL Shortener failed, safely falling back to long URL.", apiErr);
-                finalUrl = longUrl; // Safe fallback
+                alert(`Shortener Error: ${apiErr.message}\n\nFalling back to long URL...`);
+                finalUrl = longUrl; 
             }
             
             navigator.clipboard.writeText(finalUrl).then(() => {
                 btn.innerHTML = "✅ Link Copied!";
                 btn.style.backgroundColor = "var(--ios-green)"; btn.style.color = "white";
-                
                 setTimeout(() => { 
                     btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
-                    if (hasExcludedImages) {
-                        alert("Notice: A heavy image was detected in your project. It was safely removed from the link to prevent the browser from crashing. (Add an ImgBB API Key in the code to share images via cloud links instead!)");
-                    }
-                }, 1500);
+                }, 2000);
             });
         } catch (err) { 
             btn.innerHTML = originalText;
-            alert("Error creating share link."); 
+            alert("Error: The project data might be too large for a single link."); 
         }
     }
 
