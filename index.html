@@ -350,7 +350,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.0 (Final Link Fix)
+    Build v4.1 (The Missing Function Fix)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -720,14 +720,28 @@
     }
 
     // =========================================================================
-    // V4 FINAL LOAD ENGINE: SECURE & BULLETPROOF
+    // FIX: THIS IS THE MISSING FUNCTION THAT CAUSED THE ENTIRE SCRIPT TO CRASH
     // =========================================================================
+    function loadProjects() {
+        try {
+            const stored = localStorage.getItem('materialEstimatorProjects');
+            if (stored) {
+                savedProjects = JSON.parse(stored);
+            } else {
+                savedProjects = [];
+            }
+        } catch (error) {
+            console.error("Could not load saved projects:", error);
+            savedProjects = [];
+        }
+    }
+
     window.onload = async function() {
         await loadLibrary(); 
-        loadProjects();
         
-        // We use the browser's native URL parser. This makes sure that if chat apps 
-        // add tracking tags (like &fbclid=...), it doesn't corrupt the data extraction.
+        // This line was crashing before because the function didn't exist!
+        loadProjects(); 
+        
         const currentUrl = new URL(window.location.href);
         let sharedData = currentUrl.searchParams.get('data') || currentUrl.searchParams.get('d');
         let isViewOnly = currentUrl.searchParams.get('view') === '1';
@@ -736,10 +750,8 @@
             try {
                 isViewOnlyMode = isViewOnly;
 
-                // Native decompression meant strictly for URLs
                 let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
                 
-                // Fallback just in case they click a broken V3 link 
                 if (!decodedString) {
                      decodedString = LZString.decompressFromBase64(sharedData.replace(/ /g, '+'));
                 }
@@ -754,7 +766,6 @@
                 
                 if (!isViewOnlyMode) {
                     setTimeout(() => { saveState(); }, 100); 
-                    // Clean the URL bar safely
                     window.history.pushState({}, document.title, window.location.pathname);
                 } else {
                     lockUIForViewOnly();
@@ -762,7 +773,7 @@
 
             } catch (e) { 
                 console.error("Load Engine Error:", e); 
-                alert("⚠️ ERROR LOADING DATA\n\nThe link is corrupted. Please generate a new link using this latest v4.0 code.");
+                alert("⚠️ ERROR LOADING DATA\n\nThe link is corrupted. Please generate a new link using this latest code.");
                 setupDefaultTable(); 
             }
         } else { 
@@ -985,9 +996,6 @@
         calculate();
     }
 
-    // =========================================================================
-    // V4 FINAL GENERATOR: PURE NATIVE CODE, NO EXTERNAL API SHORTENER
-    // =========================================================================
     async function generateShareLink(makeViewOnly = false) {
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
@@ -997,16 +1005,11 @@
         btn.innerHTML = "⏳ Copying...";
 
         try {
-            // 1. Native, foolproof URL-safe compression
             const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-            
-            // 2. Build the link securely, ignoring any existing hashes
             const baseUrl = window.location.href.split('?')[0].split('#')[0]; 
             const viewParam = makeViewOnly ? "&view=1" : "";
             const finalUrl = `${baseUrl}?data=${compressedData}${viewParam}`;
             
-            // 3. Write directly to clipboard. By removing the spoo.me shortener, 
-            // we eliminate 100% of network failures, API limits, and redirect corruptions.
             await navigator.clipboard.writeText(finalUrl);
             
             btn.innerHTML = "✅ Link Copied!";
