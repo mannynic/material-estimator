@@ -350,7 +350,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v2.1 (Link Fix)
+    Build v3.0 (Ultimate Link Engine)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -719,28 +719,40 @@
         }
     }
 
-    // --- BUG FIX: BULLETPROOF LOAD ENGINE v2.1 ---
+    // =========================================================================
+    // BUG FIX: V3 ULTIMATE LINK ENGINE
+    // Uses strict Base64 encoding + encodeURIComponent to make data totally bulletproof.
+    // Adds specific error catches so if a chat app cuts the link, you actually know!
+    // =========================================================================
     window.onload = async function() {
         await loadLibrary(); 
         loadProjects();
         
-        const rawSearch = window.location.search;
-        const isViewOnlyModeParam = rawSearch.includes('view=1'); 
+        const params = new URLSearchParams(window.location.search);
         
-        if (rawSearch.includes('data=')) {
+        // Check for 'd' (new v3 links) or 'data' (old v1/v2 links)
+        let sharedData = params.get('d') || params.get('data'); 
+        let isViewOnly = params.get('view') === '1';
+        
+        if (sharedData) {
             try {
-                if (isViewOnlyModeParam) isViewOnlyMode = true;
+                isViewOnlyMode = isViewOnly;
 
-                // 1. Manually extract the data parameter to completely bypass URLSearchParams parsing bugs
-                let sharedData = rawSearch.split('data=')[1].split('&')[0];
-                
-                // 2. Fix URL shortener/chat app mangling (turns %2B back to +, and spaces back to +)
-                sharedData = decodeURIComponent(sharedData).replace(/ /g, '+');
+                // Fix: URL shorteners sometimes decode '+' symbols into empty spaces. 
+                // Since base64 relies heavily on '+', we force them back.
+                sharedData = sharedData.replace(/ /g, '+');
 
-                let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
+                // Try the new ultra-stable Base64 decompression first
+                let decodedString = LZString.decompressFromBase64(sharedData);
                 
+                // Fallback if someone clicks an older v2.0/v2.1 link you already sent out
                 if (!decodedString) {
-                     throw new Error("LZString returned null. String is corrupted.");
+                    decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
+                }
+
+                // If it STILL fails, the URL was physically chopped off by a chat app limit.
+                if (!decodedString) {
+                    throw new Error("Data string was truncated or destroyed during sharing.");
                 }
 
                 const decodedData = JSON.parse(decodedString);
@@ -749,6 +761,7 @@
                 
                 if (!isViewOnlyMode) {
                     setTimeout(() => { saveState(); }, 100); 
+                    // Clear the giant URL from the address bar so it looks clean
                     window.history.pushState({}, document.title, window.location.pathname);
                 } else {
                     lockUIForViewOnly();
@@ -756,7 +769,8 @@
 
             } catch (e) { 
                 console.error("Link Data Extraction Error:", e); 
-                alert("⚠️ The share link data is corrupted. This usually happens if a chat app or shortener cut off the link.\n\nOpening a New Document instead.");
+                // NEW ALERT: Tells you exactly WHY it opened a blank document
+                alert("⚠️ ERROR LOADING SAVED DATA ⚠️\n\nThe project file could not be read. This almost always happens if the app you used to send the link (like Messenger/Viber) cut off the end of the text because it was too long.\n\nOpening a blank document instead.");
                 setupDefaultTable(); 
             }
         } else { 
@@ -979,7 +993,10 @@
         calculate();
     }
 
-    // --- SECURE URL SHORTENER INTEGRATION (spoo.me POST) ---
+    // =========================================================================
+    // BUG FIX: V3 GENERATION ENGINE
+    // Base64 + Strict encodeURIComponent ensures shorteners can't corrupt the data
+    // =========================================================================
     async function generateShareLink(makeViewOnly = false) {
         
         const exportData = extractCurrentProjectData(true); 
@@ -994,19 +1011,27 @@
         btn.innerHTML = "⏳ Generating...";
 
         try {
-            // FIX: Removed the extra encodeURIComponent that was causing the data to be double-encoded 
-            // and unreadable by the load engine. LZString already makes this URL-safe!
-            const encodedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
+            // 1. Convert JSON to raw string
+            const rawJson = JSON.stringify(exportData);
             
-            const baseUrl = window.location.href.split('?')[0]; 
-            const viewParam = makeViewOnly ? "&view=1" : "";
-            const longUrl = baseUrl + "?data=" + encodedData + viewParam;
+            // 2. Compress using universally safe Base64
+            const compressedData = LZString.compressToBase64(rawJson);
+            
+            // 3. Force-encode it so no browser/shortener can accidentally misread a '+' as a space
+            const safeData = encodeURIComponent(compressedData);
+            
+            // Generate clean base URL without existing parameters
+            const baseUrl = window.location.origin + window.location.pathname; 
+            const viewParam = makeViewOnly ? "&view=1" : "&view=0";
+            
+            // Build the final bulletproof URL
+            const longUrl = `${baseUrl}?d=${safeData}${viewParam}`;
             
             let finalUrl = longUrl;
 
             try {
                 let bodyData = new URLSearchParams();
-                bodyData.append('url', longUrl); // URLSearchParams automatically encodes the parameters perfectly for the POST
+                bodyData.append('url', longUrl);
 
                 const response = await fetch('https://spoo.me/', {
                     method: 'POST',
@@ -1021,7 +1046,7 @@
                     const data = await response.json();
                     finalUrl = data.short_url;
                 } else {
-                    console.warn("Shortener rejected request. Falling back to long URL.");
+                    console.warn("Shortener rejected request. Using fallback URL.");
                 }
             } catch (apiErr) {
                 console.warn("Network error connecting to shortener:", apiErr);
@@ -1035,12 +1060,15 @@
                     btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
                     if (hasExcludedImages) {
                         alert("Notice: A large local image was safely excluded from the link to prevent crashing.");
+                    } else if (finalUrl === longUrl && finalUrl.length > 2000) {
+                        // NEW ALERT: Warns you if the URL shortener failed and the resulting link is dangerously massive
+                        alert("⚠️ LINK GENERATED, BUT IT IS VERY LONG ⚠️\n\nThe URL shortener failed, so a raw link was copied instead. \n\nIf you send this via Messenger, Viber, or Discord, make sure the person copies the ENTIRE link. Chat apps often cut off long text, which will result in a blank document on their end!");
                     }
                 }, 2000);
             });
         } catch (err) { 
             btn.innerHTML = originalText;
-            alert("Error creating share link. The project might be too large."); 
+            alert("Error creating share link. The project file might be completely overflowing the memory limit."); 
         }
     }
 
@@ -1142,7 +1170,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "library.json"); // Now downloads directly as library.json
+        downloadAnchorNode.setAttribute("download", "library.json"); 
         document.body.appendChild(downloadAnchorNode); 
         downloadAnchorNode.click(); downloadAnchorNode.remove();
     }
