@@ -350,7 +350,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.1 (The Missing Function Fix)
+    Build v4.2 (Short Link Restored)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -719,9 +719,6 @@
         }
     }
 
-    // =========================================================================
-    // FIX: THIS IS THE MISSING FUNCTION THAT CAUSED THE ENTIRE SCRIPT TO CRASH
-    // =========================================================================
     function loadProjects() {
         try {
             const stored = localStorage.getItem('materialEstimatorProjects');
@@ -738,8 +735,6 @@
 
     window.onload = async function() {
         await loadLibrary(); 
-        
-        // This line was crashing before because the function didn't exist!
         loadProjects(); 
         
         const currentUrl = new URL(window.location.href);
@@ -996,20 +991,54 @@
         calculate();
     }
 
+    // =========================================================================
+    // V4.2 SHORTENER RESTORED WITH SAFE URLSearchParams
+    // =========================================================================
     async function generateShareLink(makeViewOnly = false) {
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
         
+        const originalData = extractCurrentProjectData(false);
+        const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
+        
         const btn = makeViewOnly ? document.getElementById('shareViewBtn') : document.getElementById('shareBtn');
         const originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ Copying...";
+        btn.innerHTML = "⏳ Generating Short Link...";
 
         try {
+            // Safe Native Compression
             const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
             const baseUrl = window.location.href.split('?')[0].split('#')[0]; 
             const viewParam = makeViewOnly ? "&view=1" : "";
-            const finalUrl = `${baseUrl}?data=${compressedData}${viewParam}`;
+            const longUrl = `${baseUrl}?data=${compressedData}${viewParam}`;
             
+            let finalUrl = longUrl;
+
+            // Attempt Spoo.me URL Shortening
+            try {
+                let bodyData = new URLSearchParams();
+                bodyData.append('url', longUrl);
+
+                const response = await fetch('https://spoo.me/', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: bodyData.toString()
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    finalUrl = data.short_url;
+                } else {
+                    console.warn("Shortener API rejected request. Falling back to long URL.");
+                }
+            } catch (apiErr) {
+                console.warn("Network error connecting to shortener:", apiErr);
+            }
+            
+            // Copy to Clipboard
             await navigator.clipboard.writeText(finalUrl);
             
             btn.innerHTML = "✅ Link Copied!";
@@ -1017,6 +1046,12 @@
             
             setTimeout(() => { 
                 btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
+                if (hasExcludedImages) {
+                    alert("Notice: A large local image was safely excluded from the link to prevent crashing.");
+                } else if (finalUrl === longUrl && finalUrl.length > 2000) {
+                    // Fallback warning if shortener fails
+                    alert("⚠️ SHORTENER FAILED ⚠️\n\nThe URL shortener API was temporarily unavailable, so a long backup link was copied instead. Make sure whoever you send this to copies the ENTIRE link!");
+                }
             }, 2000);
         } catch (err) { 
             console.error("Link Generation Error:", err);
