@@ -239,6 +239,10 @@
         .search-bar-wrapper input { padding-left: 40px; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
+        /* Share Modal Specifics */
+        .share-input-box { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; font-family: monospace; font-size: 12px; margin-bottom: 15px; color: var(--text-main); resize: none; overflow: hidden; }
+        .shortener-panel { background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 20px; text-align: center;}
+
         @media print {
             body { background-color: white; padding: 0; }
             .container { box-shadow: none; padding: 0; max-width: 100%; }
@@ -297,6 +301,30 @@
     <option value="roll"></option><option value="ft"></option><option value="m"></option>
 </datalist>
 
+<div id="shareCenterModal" class="modal no-print">
+    <div class="modal-content" style="max-width: 600px;">
+        <div>
+            <span class="close-modal" onclick="closeModal('shareCenterModal')">&times;</span>
+            <h2 style="margin-top: 0; font-weight: 700; letter-spacing: -0.5px;">Share Project</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">This unblockable link contains all your data encoded inside it. It works offline and bypasses all firewalls.</p>
+        </div>
+        
+        <textarea id="longShareLinkBox" class="share-input-box" rows="4" readonly></textarea>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn btn-primary" onclick="copyBoxToClipboard('longShareLinkBox', this)" style="flex: 1;">📋 Copy Direct Link</button>
+        </div>
+
+        <div class="shortener-panel">
+            <h4 style="margin: 0 0 10px 0; color: var(--text-main);">Want a shorter link?</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">If your network blocks APIs, click the button below. Our server will attempt to bypass your firewall automatically.</p>
+            
+            <button class="btn btn-manage" id="autoShortenBtn" onclick="runShortenerWaterfall()">🪄 Attempt Auto-Shorten</button>
+            <div id="shortenWaterfallStatus" style="font-size: 13px; font-weight: 600; margin-top: 15px; color: var(--ios-blue);"></div>
+        </div>
+    </div>
+</div>
+
 <div id="libraryModal" class="modal no-print">
     <div class="modal-content">
         <div>
@@ -350,7 +378,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.4 (CORS Bypass Fix)
+    Build v4.5 (Share Center Update)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -430,8 +458,8 @@
             <button class="btn btn-primary" onclick="addRow()">+ Material</button>
             <button class="btn btn-section" onclick="addSection()">+ Section</button>
             <span style="margin: 0 10px; color:var(--border-color);">|</span>
-            <button class="btn btn-share" onclick="generateShareLink(false)" id="shareBtn">🔗 Share Link</button>
-            <button class="btn btn-share" onclick="generateShareLink(true)" id="shareViewBtn" style="background-color: rgba(88, 86, 214, 0.1); color: var(--ios-purple);">👁️ Share (View Only)</button>
+            <button class="btn btn-share" onclick="openShareCenter(false)">🔗 Share Center</button>
+            <button class="btn btn-share" onclick="openShareCenter(true)" style="background-color: rgba(88, 86, 214, 0.1); color: var(--ios-purple);">👁️ Share (View Only)</button>
         </div>
         <div style="margin-top:10px;">
             <button class="btn btn-library" onclick="saveToLibrary()" id="saveLibBtn">Save to Library</button>
@@ -467,6 +495,9 @@
     let currentImageData = null; 
     let currentProjectId = null;
     let dragSrcEl = null;
+    
+    // Store generated long link globally for the Share Center
+    let cachedLongShareLink = "";
 
     // --- UNDO / REDO ENGINE ---
     function saveState() {
@@ -845,7 +876,7 @@
             l: document.getElementById('location').value,
             d: document.getElementById('projectDate').value,
             i: safeImage(currentImageData), 
-            layout: document.getElementById('layoutLinkInput').value.trim(), // Save the layout link
+            layout: document.getElementById('layoutLinkInput').value.trim(), 
             rows: [],
             total: parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim()) || 0
         };
@@ -992,85 +1023,105 @@
     }
 
     // =========================================================================
-    // V4.4 CORS BYPASS (JSONP) FOR GUARANTEED SHORT LINKS
+    // V4.5 THE SHARE CENTER (FIREWALL BYPASS UI)
     // =========================================================================
-    async function generateShareLink(makeViewOnly = false) {
+    function openShareCenter(makeViewOnly = false) {
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
         
         const originalData = extractCurrentProjectData(false);
         const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
         
-        const btn = makeViewOnly ? document.getElementById('shareViewBtn') : document.getElementById('shareBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ Generating Safe Link...";
+        // Native Compression to Long URL
+        const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
+        const baseUrl = window.location.href.split('?')[0].split('#')[0]; 
+        const viewParam = makeViewOnly ? "&view=1" : "";
+        cachedLongShareLink = `${baseUrl}?data=${compressedData}${viewParam}`;
 
-        try {
-            const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-            const baseUrl = window.location.href.split('?')[0].split('#')[0]; 
-            const viewParam = makeViewOnly ? "&view=1" : "";
-            const longUrl = `${baseUrl}?data=${compressedData}${viewParam}`;
-            
-            let finalUrl = longUrl;
-            let shortenerFailed = false;
-
-            // Use JSONP to perfectly bypass CORS restrictions
-            try {
-                finalUrl = await new Promise((resolve, reject) => {
-                    const callbackName = 'isgd_callback_' + Math.round(100000 * Math.random());
-                    
-                    const timeout = setTimeout(() => {
-                        cleanup();
-                        reject(new Error("Timeout"));
-                    }, 5000);
-
-                    const cleanup = () => {
-                        clearTimeout(timeout);
-                        delete window[callbackName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                    };
-
-                    window[callbackName] = function(data) {
-                        cleanup();
-                        if (data && data.shorturl) {
-                            resolve(data.shorturl);
-                        } else {
-                            reject(new Error(data ? data.errormessage : "Unknown error"));
-                        }
-                    };
-
-                    const script = document.createElement('script');
-                    script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${callbackName}`;
-                    script.onerror = () => {
-                        cleanup();
-                        reject(new Error("Script error"));
-                    };
-                    document.body.appendChild(script);
-                });
-            } catch (err) {
-                console.warn("JSONP Shortener failed:", err);
-                shortenerFailed = true;
-                finalUrl = longUrl; // Fallback to long URL safely
-            }
-            
-            await navigator.clipboard.writeText(finalUrl);
-            
-            btn.innerHTML = "✅ Link Copied!";
-            btn.style.backgroundColor = "var(--ios-green)"; btn.style.color = "white";
-            
-            setTimeout(() => { 
-                btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
-                if (hasExcludedImages) {
-                    alert("Notice: A large local image was safely excluded from the link to prevent crashing.");
-                } else if (shortenerFailed) {
-                    alert("⚠️ SHORTENER BLOCKED ⚠️\n\nYour browser or network completely blocked the URL shortener. A long backup link was copied instead. Make sure whoever you send this to copies the ENTIRE link!");
-                }
-            }, 2000);
-        } catch (err) { 
-            console.error("Link Generation Error:", err);
-            btn.innerHTML = originalText;
-            alert("Error creating share link."); 
+        // Reset UI
+        document.getElementById('longShareLinkBox').value = cachedLongShareLink;
+        document.getElementById('shortenWaterfallStatus').innerHTML = "";
+        document.getElementById('autoShortenBtn').style.display = "inline-flex";
+        document.getElementById('autoShortenBtn').disabled = false;
+        
+        document.getElementById('shareCenterModal').style.display = 'flex';
+        
+        if (hasExcludedImages) {
+            alert("Notice: A large pasted image was safely excluded from the link so it wouldn't crash the URL limit. (Cloud uploaded images are fine).");
         }
+    }
+
+    async function copyBoxToClipboard(elementId, btnEl) {
+        const text = document.getElementById(elementId).value;
+        try {
+            await navigator.clipboard.writeText(text);
+            const originalText = btnEl.innerHTML;
+            btnEl.innerHTML = "✅ Copied!";
+            btnEl.style.backgroundColor = "var(--ios-green)";
+            btnEl.style.color = "white";
+            setTimeout(() => {
+                btnEl.innerHTML = originalText;
+                btnEl.style.backgroundColor = "";
+                btnEl.style.color = "";
+            }, 2000);
+        } catch (err) {
+            alert("Failed to copy. Please select the text manually.");
+        }
+    }
+
+    async function runShortenerWaterfall() {
+        const btn = document.getElementById('autoShortenBtn');
+        const statusBox = document.getElementById('shortenWaterfallStatus');
+        const linkBox = document.getElementById('longShareLinkBox');
+        
+        btn.disabled = true;
+        statusBox.style.color = "var(--text-main)";
+
+        // NOTE: The URL might be massively long due to custom PDF encoding mods. 
+        // If it's over 4000 chars, most public shorteners will hard-reject it.
+        if (cachedLongShareLink.length > 5000) {
+            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share (likely a custom embedded PDF) makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this immediately.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`;
+            btn.style.display = "none";
+            return;
+        }
+
+        // Waterfall Attempt 1: CORS Proxy to is.gd
+        try {
+            statusBox.innerHTML = "⏳ Attempting Server 1 (Proxy Bypass)...";
+            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://is.gd/create.php?format=json&url=' + encodeURIComponent(cachedLongShareLink))}`);
+            const data = await res.json();
+            if (data.shorturl) {
+                applyShortLink(data.shorturl, "✅ Success via Server 1!");
+                return;
+            }
+        } catch (e) { console.warn("Waterfall 1 failed:", e); }
+
+        // Waterfall Attempt 2: Spoo.me POST
+        try {
+            statusBox.innerHTML = "⏳ Attempting Server 2 (Direct POST)...";
+            let bodyData = new URLSearchParams();
+            bodyData.append('url', cachedLongShareLink);
+            const res = await fetch('https://spoo.me/', { method: 'POST', body: bodyData });
+            const data = await res.json();
+            if (data.short_url) {
+                applyShortLink(data.short_url, "✅ Success via Server 2!");
+                return;
+            }
+        } catch (e) { console.warn("Waterfall 2 failed:", e); }
+
+        // All Attempts Failed (Firewall/Adblocker is too strict)
+        statusBox.innerHTML = `
+            ❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENER</b><br><br>
+            Your browser (or corporate network) is strictly blocking background API requests. We cannot automatically shorten the link.<br><br>
+            <span style="color:var(--ios-blue);">Please click "Copy Direct Link" above, it will work perfectly offline!</span>
+        `;
+        btn.style.display = "none";
+    }
+
+    function applyShortLink(url, successMsg) {
+        document.getElementById('longShareLinkBox').value = url;
+        document.getElementById('autoShortenBtn').style.display = "none";
+        document.getElementById('shortenWaterfallStatus').innerHTML = successMsg + "<br><br><span style='color:var(--ios-purple);'>The textbox above has been updated. Click Copy.</span>";
     }
 
     function saveStorage() { localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials)); }
