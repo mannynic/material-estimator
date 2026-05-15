@@ -350,7 +350,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v2.0 (Link Fix)
+    Build v2.1 (Link Fix)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -719,33 +719,32 @@
         }
     }
 
-    // --- BUG FIX: BULLETPROOF URL LOAD ENGINE ---
+    // --- BUG FIX: BULLETPROOF LOAD ENGINE v2.1 ---
     window.onload = async function() {
         await loadLibrary(); 
         loadProjects();
         
-        const urlParams = new URLSearchParams(window.location.search);
-        let sharedData = urlParams.get('data');
-        const viewModeParam = urlParams.get('view') === '1'; 
+        const rawSearch = window.location.search;
+        const isViewOnlyModeParam = rawSearch.includes('view=1'); 
         
-        if (sharedData) {
+        if (rawSearch.includes('data=')) {
             try {
-                if (viewModeParam) isViewOnlyMode = true;
+                if (isViewOnlyModeParam) isViewOnlyMode = true;
 
-                // FIX: URL shorteners routinely convert mathematical '+' symbols into empty spaces 
-                // during browser redirects. Because the LZString compressor heavily uses '+' symbols, 
-                // we must forcibly translate any rogue spaces back into '+' before decompressing.
-                sharedData = sharedData.replace(/ /g, '+');
+                // 1. Manually extract the data parameter to completely bypass URLSearchParams parsing bugs
+                let sharedData = rawSearch.split('data=')[1].split('&')[0];
+                
+                // 2. Fix URL shortener/chat app mangling (turns %2B back to +, and spaces back to +)
+                sharedData = decodeURIComponent(sharedData).replace(/ /g, '+');
 
                 let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
                 
-                // Fallback for edge cases
                 if (!decodedString) {
-                     decodedString = atob(decodeURIComponent(sharedData));
+                     throw new Error("LZString returned null. String is corrupted.");
                 }
 
                 const decodedData = JSON.parse(decodedString);
-                console.log("Success! Shared data loaded.");
+                console.log("Data successfully recovered!");
                 loadProjectToScreen(decodedData);
                 
                 if (!isViewOnlyMode) {
@@ -756,8 +755,8 @@
                 }
 
             } catch (e) { 
-                console.error("Error loading shared link data.", e); 
-                alert("Notice: The shared link could not be read properly. Opening a new document.");
+                console.error("Link Data Extraction Error:", e); 
+                alert("⚠️ The share link data is corrupted. This usually happens if a chat app or shortener cut off the link.\n\nOpening a New Document instead.");
                 setupDefaultTable(); 
             }
         } else { 
@@ -995,19 +994,19 @@
         btn.innerHTML = "⏳ Generating...";
 
         try {
-            // Encode the string fully to protect symbols during transit and server shortening
-            const rawEncoded = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-            const urlSafeData = encodeURIComponent(rawEncoded); 
+            // FIX: Removed the extra encodeURIComponent that was causing the data to be double-encoded 
+            // and unreadable by the load engine. LZString already makes this URL-safe!
+            const encodedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
             
             const baseUrl = window.location.href.split('?')[0]; 
             const viewParam = makeViewOnly ? "&view=1" : "";
-            const longUrl = baseUrl + "?data=" + urlSafeData + viewParam;
+            const longUrl = baseUrl + "?data=" + encodedData + viewParam;
             
             let finalUrl = longUrl;
 
             try {
                 let bodyData = new URLSearchParams();
-                bodyData.append('url', longUrl);
+                bodyData.append('url', longUrl); // URLSearchParams automatically encodes the parameters perfectly for the POST
 
                 const response = await fetch('https://spoo.me/', {
                     method: 'POST',
