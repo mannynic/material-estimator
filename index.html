@@ -725,24 +725,31 @@
         }
     }
 
+    // --- BUG FIX: PROPER URL DECODING FOR LOAD ENGINE ---
     window.onload = async function() {
         await loadLibrary(); 
         loadProjects();
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const sharedData = urlParams.get('data');
-        const viewModeParam = urlParams.get('view') === '1'; 
+        // Grab the raw 'data' parameter directly to prevent the browser from deleting the '+' signs 
+        // that are used by the LZString compressor.
+        const searchRaw = window.location.search;
+        const dataMatch = searchRaw.match(/[?&]data=([^&]+)/);
+        let sharedData = dataMatch ? dataMatch[1] : null;
+        
+        const viewModeParam = searchRaw.includes('view=1'); 
         
         if (sharedData) {
             try {
                 if (viewModeParam) isViewOnlyMode = true;
 
-                let decodedString = "";
-                try {
-                    decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
-                    if (!decodedString) throw new Error("Not LZ-String formatted");
-                } catch(e) {
-                    decodedString = atob(decodeURIComponent(sharedData));
+                let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
+                
+                // Fallback for older links or if URLSearchParams was used somewhere else in the chain
+                if (!decodedString) {
+                    decodedString = LZString.decompressFromEncodedURIComponent(sharedData.replace(/ /g, '+'));
+                }
+                if (!decodedString) {
+                     decodedString = atob(decodeURIComponent(sharedData));
                 }
 
                 const decodedData = JSON.parse(decodedString);
