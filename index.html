@@ -41,6 +41,7 @@
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.04), 0 2px 10px rgba(0,0,0,0.02);
+            position: relative;
         }
 
         .company-header {
@@ -253,7 +254,7 @@
             .print-only-desc { display: block !important; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; color: #000; padding: 2px 0; line-height: 1.4; }
             
             hr.main-separator {
-                border-top: 4px solid #000 !important; /* Forces black line on print */
+                border-top: 4px solid #000 !important;
                 margin: 25px 0 20px 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
@@ -291,15 +292,9 @@
 <body>
 
 <datalist id="uomList">
-    <option value="pcs"></option>
-    <option value="sqin"></option>
-    <option value="sqm"></option>
-    <option value="sqft"></option>
-    <option value="sht"></option>
-    <option value="set"></option>
-    <option value="roll"></option>
-    <option value="ft"></option>
-    <option value="m"></option>
+    <option value="pcs"></option><option value="sqin"></option><option value="sqm"></option>
+    <option value="sqft"></option><option value="sht"></option><option value="set"></option>
+    <option value="roll"></option><option value="ft"></option><option value="m"></option>
 </datalist>
 
 <div id="libraryModal" class="modal no-print">
@@ -352,6 +347,10 @@
         </div>
         <div id="projectsListContainer" style="flex-grow: 1; overflow-y: auto;"></div>
     </div>
+</div>
+
+<div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
+    Build v2.0 (Link Fix)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -695,25 +694,20 @@
     // --- CLOUD LIBRARY LOADER (GITHUB FETCH) ---
     async function loadLibrary() {
         try {
-            // Attempt to fetch the master library from GitHub (with a cache-buster so it always gets the newest version)
             const response = await fetch('library.json?t=' + new Date().getTime());
-            
             if (response.ok) {
                 savedMaterials = await response.json();
-                // Sync the local storage so it stays updated
                 localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials));
-                return; // Successfully loaded from GitHub
+                return;
             }
         } catch (error) {
             console.warn("Could not load master library from GitHub. Falling back to local storage.", error);
         }
 
-        // If GitHub fetch fails (e.g. running locally or file not uploaded yet), fall back to local storage
         const stored = localStorage.getItem('materialEstimatorLibrary');
         if (stored) { 
             savedMaterials = JSON.parse(stored); 
         } else {
-            // Ultimate fallback defaults
             savedMaterials = [
                 { name: "Acrylic Sheet (Clear, 3mm)", price: 1500 }, 
                 { name: "Sintra Board (White, 5mm)", price: 850 },
@@ -725,34 +719,33 @@
         }
     }
 
-    // --- BUG FIX: PROPER URL DECODING FOR LOAD ENGINE ---
+    // --- BUG FIX: BULLETPROOF URL LOAD ENGINE ---
     window.onload = async function() {
         await loadLibrary(); 
         loadProjects();
         
-        // Grab the raw 'data' parameter directly to prevent the browser from deleting the '+' signs 
-        // that are used by the LZString compressor.
-        const searchRaw = window.location.search;
-        const dataMatch = searchRaw.match(/[?&]data=([^&]+)/);
-        let sharedData = dataMatch ? dataMatch[1] : null;
-        
-        const viewModeParam = searchRaw.includes('view=1'); 
+        const urlParams = new URLSearchParams(window.location.search);
+        let sharedData = urlParams.get('data');
+        const viewModeParam = urlParams.get('view') === '1'; 
         
         if (sharedData) {
             try {
                 if (viewModeParam) isViewOnlyMode = true;
 
+                // FIX: URL shorteners routinely convert mathematical '+' symbols into empty spaces 
+                // during browser redirects. Because the LZString compressor heavily uses '+' symbols, 
+                // we must forcibly translate any rogue spaces back into '+' before decompressing.
+                sharedData = sharedData.replace(/ /g, '+');
+
                 let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
                 
-                // Fallback for older links or if URLSearchParams was used somewhere else in the chain
-                if (!decodedString) {
-                    decodedString = LZString.decompressFromEncodedURIComponent(sharedData.replace(/ /g, '+'));
-                }
+                // Fallback for edge cases
                 if (!decodedString) {
                      decodedString = atob(decodeURIComponent(sharedData));
                 }
 
                 const decodedData = JSON.parse(decodedString);
+                console.log("Success! Shared data loaded.");
                 loadProjectToScreen(decodedData);
                 
                 if (!isViewOnlyMode) {
@@ -762,8 +755,14 @@
                     lockUIForViewOnly();
                 }
 
-            } catch (e) { console.error("Error loading shared link data.", e); setupDefaultTable(); }
-        } else { setupDefaultTable(); }
+            } catch (e) { 
+                console.error("Error loading shared link data.", e); 
+                alert("Notice: The shared link could not be read properly. Opening a new document.");
+                setupDefaultTable(); 
+            }
+        } else { 
+            setupDefaultTable(); 
+        }
     };
 
     function lockUIForViewOnly() {
@@ -996,10 +995,13 @@
         btn.innerHTML = "⏳ Generating...";
 
         try {
-            const encodedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
+            // Encode the string fully to protect symbols during transit and server shortening
+            const rawEncoded = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
+            const urlSafeData = encodeURIComponent(rawEncoded); 
+            
             const baseUrl = window.location.href.split('?')[0]; 
             const viewParam = makeViewOnly ? "&view=1" : "";
-            const longUrl = baseUrl + "?data=" + encodedData + viewParam;
+            const longUrl = baseUrl + "?data=" + urlSafeData + viewParam;
             
             let finalUrl = longUrl;
 
@@ -1033,7 +1035,7 @@
                 setTimeout(() => { 
                     btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
                     if (hasExcludedImages) {
-                        alert("Notice: A large image couldn't be uploaded to the cloud and was safely removed from the link to prevent crashing.");
+                        alert("Notice: A large local image was safely excluded from the link to prevent crashing.");
                     }
                 }, 2000);
             });
