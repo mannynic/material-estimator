@@ -378,7 +378,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.5 (Share Center Update)
+    Build v4.6 (The Whitelist Update)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -1023,7 +1023,7 @@
     }
 
     // =========================================================================
-    // V4.5 THE SHARE CENTER (FIREWALL BYPASS UI)
+    // V4.6 THE WHITELIST UPDATE (Anti-Virus / Brave Shield Bypass)
     // =========================================================================
     function openShareCenter(makeViewOnly = false) {
         const exportData = extractCurrentProjectData(true); 
@@ -1072,46 +1072,60 @@
     async function runShortenerWaterfall() {
         const btn = document.getElementById('autoShortenBtn');
         const statusBox = document.getElementById('shortenWaterfallStatus');
-        const linkBox = document.getElementById('longShareLinkBox');
         
         btn.disabled = true;
         statusBox.style.color = "var(--text-main)";
 
-        // NOTE: The URL might be massively long due to custom PDF encoding mods. 
-        // If it's over 4000 chars, most public shorteners will hard-reject it.
         if (cachedLongShareLink.length > 5000) {
-            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share (likely a custom embedded PDF) makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this immediately.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`;
+            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this immediately.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`;
             btn.style.display = "none";
             return;
         }
 
-        // Waterfall Attempt 1: CORS Proxy to is.gd
+        // Waterfall Attempt 1: TinyURL (Most trusted globally, ignores AV blocks)
         try {
-            statusBox.innerHTML = "⏳ Attempting Server 1 (Proxy Bypass)...";
-            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://is.gd/create.php?format=json&url=' + encodeURIComponent(cachedLongShareLink))}`);
-            const data = await res.json();
-            if (data.shorturl) {
-                applyShortLink(data.shorturl, "✅ Success via Server 1!");
-                return;
+            statusBox.innerHTML = "⏳ Attempting Server 1 (TinyURL - Firewall Safe)...";
+            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(cachedLongShareLink))}`);
+            if (res.ok) {
+                const text = await res.text();
+                if (text && text.includes('tinyurl.com')) {
+                    applyShortLink(text, "✅ Success via TinyURL!<br><span style='color:var(--text-muted); font-size:11px; font-weight:normal;'>Note: TinyURL may show a 10-second 'Preview' page to the person clicking it, but it will safely bypass your network's Antivirus block.</span>");
+                    return;
+                }
             }
         } catch (e) { console.warn("Waterfall 1 failed:", e); }
 
-        // Waterfall Attempt 2: Spoo.me POST
+        // Waterfall Attempt 2: CleanURI
         try {
-            statusBox.innerHTML = "⏳ Attempting Server 2 (Direct POST)...";
+            statusBox.innerHTML = "⏳ Attempting Server 2 (CleanURI)...";
+            const res = await fetch('https://corsproxy.io/?https://cleanuri.com/api/v1/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `url=${encodeURIComponent(cachedLongShareLink)}`
+            });
+            const data = await res.json();
+            if (data.result_url) {
+                applyShortLink(data.result_url, "✅ Success via CleanURI!");
+                return;
+            }
+        } catch (e) { console.warn("Waterfall 2 failed:", e); }
+
+        // Waterfall Attempt 3: Spoo.me (Direct POST)
+        try {
+            statusBox.innerHTML = "⏳ Attempting Server 3 (Spoo.me)...";
             let bodyData = new URLSearchParams();
             bodyData.append('url', cachedLongShareLink);
             const res = await fetch('https://spoo.me/', { method: 'POST', body: bodyData });
             const data = await res.json();
             if (data.short_url) {
-                applyShortLink(data.short_url, "✅ Success via Server 2!");
+                applyShortLink(data.short_url, "✅ Success via Spoo.me!");
                 return;
             }
-        } catch (e) { console.warn("Waterfall 2 failed:", e); }
+        } catch (e) { console.warn("Waterfall 3 failed:", e); }
 
-        // All Attempts Failed (Firewall/Adblocker is too strict)
+        // All Attempts Failed
         statusBox.innerHTML = `
-            ❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENER</b><br><br>
+            ❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENERS</b><br><br>
             Your browser (or corporate network) is strictly blocking background API requests. We cannot automatically shorten the link.<br><br>
             <span style="color:var(--ios-blue);">Please click "Copy Direct Link" above, it will work perfectly offline!</span>
         `;
