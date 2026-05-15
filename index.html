@@ -6,7 +6,6 @@
     <title>Project Material Estimator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <style>
         /* --- APPLE HIG DESIGN SYSTEM --- */
         :root {
@@ -116,32 +115,6 @@
             background: #fcfcfd;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-        }
-
-        #pdfPreviewContainer {
-            margin-top: 10px;
-            display: none;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #pdfThumbnail {
-            width: 80px;
-            height: 110px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            object-fit: cover;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background: white;
-        }
-
-        #pdfFileName {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--ios-blue);
-            text-decoration: underline;
-            cursor: pointer;
         }
 
         .print-na { display: none; }
@@ -311,7 +284,7 @@
             /* Prevent price text clipping */
             td input.item-input { width: 100%; box-sizing: border-box; font-size: 13px !important; }
             .item-input.price { min-width: 65px; }
-            .pdf-upload-section { border: none; background: transparent; padding: 0; }
+            .pdf-upload-section { border: none; background: transparent; padding: 0; margin: 0;}
         }
     </style>
 </head>
@@ -334,7 +307,7 @@
         <div>
             <span class="close-modal" onclick="closeModal('libraryModal')">&times;</span>
             <h2 style="margin-top: 0; font-weight: 700; letter-spacing: -0.5px;">Manage Library</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 15px;">Drag items up or down to reorder them. Changes save automatically.</p>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 15px;">Drag items up or down to reorder them. Changes save automatically locally. To update the master file for sharing, download the backup and upload it as <b>library.json</b> to your GitHub.</p>
         </div>
         
         <div class="search-bar-wrapper">
@@ -408,14 +381,14 @@
             </div>
 
             <div class="pdf-upload-section">
-                <label class="no-print">📎 Official Production Layout (PDF)</label>
-                <input type="file" id="pdfLayoutInput" accept="application/pdf" class="no-print" onchange="handlePDFUpload(this)">
+                <label class="no-print" id="layoutInputLabel">📎 Official Production Layout (Google Drive Link)</label>
+                <input type="text" id="layoutLinkInput" class="no-print" placeholder="Paste Google Drive link here..." oninput="updateLayoutLinkUI(); saveState();" style="font-size: 13px;">
                 
-                <div id="pdfPreviewContainer">
-                    <canvas id="pdfThumbnail"></canvas>
+                <div id="layoutLinkDisplay" style="display: none; margin-top: 10px; align-items: center; gap: 8px;">
+                    <span style="font-size: 24px;">📄</span>
                     <div style="display: flex; flex-direction: column;">
-                        <span id="pdfFileName">Download Layout.pdf</span>
-                        <span style="font-size: 11px; color: var(--text-muted);">Click name to download or thumbnail to view</span>
+                        <a href="#" id="clickableLayoutLink" target="_blank" style="font-size: 14px; font-weight: 600; color: var(--ios-blue); text-decoration: underline;">View Production Layout</a>
+                        <span style="font-size: 11px; color: var(--text-muted);">Opens securely via Cloud Link</span>
                     </div>
                 </div>
             </div>
@@ -493,7 +466,6 @@
     let savedMaterials = [];
     let savedProjects = [];
     let currentImageData = null; 
-    let currentPDFData = null; // Local only, not shared in URL
     let currentProjectId = null;
     let dragSrcEl = null;
 
@@ -704,53 +676,57 @@
         }
     }
 
-    // --- PDF ENGINE ---
-    async function handlePDFUpload(input) {
-        const file = input.files[0];
-        if (file && file.type === "application/pdf") {
-            const reader = new FileReader();
-            reader.onload = async function() {
-                currentPDFData = reader.result;
-                document.getElementById('pdfFileName').innerText = file.name;
-                document.getElementById('pdfPreviewContainer').style.display = 'flex';
-                
-                // Generate Thumbnail using pdf.js
-                const pdfData = new Uint8Array(reader.result);
-                const loadingTask = pdfjsLib.getDocument({data: pdfData});
-                const pdf = await loadingTask.promise;
-                const page = await pdf.getPage(1);
-                
-                const canvas = document.getElementById('pdfThumbnail');
-                const context = canvas.getContext('2d');
-                const viewport = page.getViewport({scale: 0.5});
-                
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                await page.render({canvasContext: context, viewport: viewport}).promise;
-            };
-            reader.readAsArrayBuffer(file);
+    // --- GOOGLE DRIVE LINK HANDLER ---
+    function updateLayoutLinkUI() {
+        const link = document.getElementById('layoutLinkInput').value.trim();
+        const display = document.getElementById('layoutLinkDisplay');
+        const anchor = document.getElementById('clickableLayoutLink');
+        
+        if(link) {
+            display.style.display = 'flex';
+            let finalLink = link;
+            if(!finalLink.startsWith('http')) finalLink = 'https://' + finalLink;
+            anchor.href = finalLink;
+        } else {
+            display.style.display = 'none';
         }
     }
 
-    document.getElementById('pdfFileName').onclick = function() {
-        if (currentPDFData) {
-            const blob = new Blob([currentPDFData], {type: "application/pdf"});
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = document.getElementById('pdfFileName').innerText;
-            a.click();
+    // --- CLOUD LIBRARY LOADER (GITHUB FETCH) ---
+    async function loadLibrary() {
+        try {
+            // Attempt to fetch the master library from GitHub (with a cache-buster so it always gets the newest version)
+            const response = await fetch('library.json?t=' + new Date().getTime());
+            
+            if (response.ok) {
+                savedMaterials = await response.json();
+                // Sync the local storage so it stays updated
+                localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials));
+                return; // Successfully loaded from GitHub
+            }
+        } catch (error) {
+            console.warn("Could not load master library from GitHub. Falling back to local storage.", error);
         }
-    };
-    
-    document.getElementById('pdfThumbnail').onclick = function() {
-         document.getElementById('pdfFileName').click();
-    };
 
+        // If GitHub fetch fails (e.g. running locally or file not uploaded yet), fall back to local storage
+        const stored = localStorage.getItem('materialEstimatorLibrary');
+        if (stored) { 
+            savedMaterials = JSON.parse(stored); 
+        } else {
+            // Ultimate fallback defaults
+            savedMaterials = [
+                { name: "Acrylic Sheet (Clear, 3mm)", price: 1500 }, 
+                { name: "Sintra Board (White, 5mm)", price: 850 },
+                { name: "LED Modules", price: 45 }, 
+                { name: "Vinyl Sticker (Matte)", price: 350 }, 
+                { name: "Printed Sticker", price: 1.00 },
+                { name: "Tubular Steel (1x1)", price: 480 }
+            ];
+        }
+    }
 
-    window.onload = function() {
-        loadLibrary(); 
+    window.onload = async function() {
+        await loadLibrary(); 
         loadProjects();
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -810,11 +786,13 @@
             .cut-inactive,
             .remove-cut-btn,
             #mainImageDropZone,
+            #layoutInputLabel,
+            #layoutLinkInput,
             label.no-print,
             .actions-bar span,
             .add-material-btn
         `);
-        elementsToHide.forEach(el => el.style.display = 'none');
+        elementsToHide.forEach(el => { if(el) el.style.display = 'none'; });
 
         document.querySelectorAll('.top-input').forEach(el => {
             el.style.borderBottom = '1px solid transparent !important';
@@ -836,11 +814,6 @@
     
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; calculate(); }
 
-    function loadProjects() {
-        const stored = localStorage.getItem('materialEstimatorProjects');
-        if (stored) { savedProjects = JSON.parse(stored); }
-    }
-
     function extractCurrentProjectData(sanitizeForUrl = false) {
         
         const safeImage = (imgStr) => {
@@ -855,6 +828,7 @@
             l: document.getElementById('location').value,
             d: document.getElementById('projectDate').value,
             i: safeImage(currentImageData), 
+            layout: document.getElementById('layoutLinkInput').value.trim(), // Save the layout link
             rows: [],
             total: parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim()) || 0
         };
@@ -963,6 +937,10 @@
         document.getElementById('location').value = data.l || '';
         document.getElementById('projectDate').value = data.d || '';
         
+        // Restore Layout Link
+        document.getElementById('layoutLinkInput').value = data.layout || '';
+        updateLayoutLinkUI();
+        
         const previewContainer = document.getElementById('imagePreviewContainer');
         const preview = document.getElementById('imagePreview');
         
@@ -996,11 +974,14 @@
         calculate();
     }
 
-    // --- SECURE URL SHORTENER INTEGRATION (is.gd JSONP) ---
+    // --- SECURE URL SHORTENER INTEGRATION (spoo.me POST) ---
     async function generateShareLink(makeViewOnly = false) {
         
         const exportData = extractCurrentProjectData(true); 
         delete exportData.id; 
+        
+        const originalData = extractCurrentProjectData(false);
+        const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
         
         const btn = makeViewOnly ? document.getElementById('shareViewBtn') : document.getElementById('shareBtn');
         const originalText = btn.innerHTML;
@@ -1016,34 +997,26 @@
             let finalUrl = longUrl;
 
             try {
-                finalUrl = await new Promise((resolve, reject) => {
-                    const callbackName = 'isgd_callback_' + Math.round(100000 * Math.random());
-                    
-                    window[callbackName] = function(data) {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        if (data.shorturl) {
-                            resolve(data.shorturl);
-                        } else {
-                            reject(new Error(data.errormessage || "Unknown error"));
-                        }
-                    };
+                let bodyData = new URLSearchParams();
+                bodyData.append('url', longUrl);
 
-                    const script = document.createElement('script');
-                    script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${callbackName}`;
-                    
-                    script.onerror = () => {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        reject(new Error("Script load failed or Adblocker prevented shortening."));
-                    };
-                    
-                    document.body.appendChild(script);
-                    setTimeout(() => reject(new Error("Timeout")), 5000);
+                const response = await fetch('https://spoo.me/', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: bodyData.toString()
                 });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    finalUrl = data.short_url;
+                } else {
+                    console.warn("Shortener rejected request. Falling back to long URL.");
+                }
             } catch (apiErr) {
-                console.warn("URL Shortener failed, safely falling back to long URL.", apiErr);
-                finalUrl = longUrl; // Falls back quietly without crashing
+                console.warn("Network error connecting to shortener:", apiErr);
             }
             
             navigator.clipboard.writeText(finalUrl).then(() => {
@@ -1052,26 +1025,14 @@
                 
                 setTimeout(() => { 
                     btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; 
+                    if (hasExcludedImages) {
+                        alert("Notice: A large image couldn't be uploaded to the cloud and was safely removed from the link to prevent crashing.");
+                    }
                 }, 2000);
             });
         } catch (err) { 
             btn.innerHTML = originalText;
             alert("Error creating share link. The project might be too large."); 
-        }
-    }
-
-    function loadLibrary() {
-        const stored = localStorage.getItem('materialEstimatorLibrary');
-        if (stored) { savedMaterials = JSON.parse(stored); } 
-        else {
-            savedMaterials = [
-                { name: "Acrylic Sheet (Clear, 3mm)", price: 1500 }, 
-                { name: "Sintra Board (White, 5mm)", price: 850 },
-                { name: "LED Modules", price: 45 }, 
-                { name: "Vinyl Sticker (Matte)", price: 350 }, 
-                { name: "Printed Sticker", price: 1.00 },
-                { name: "Tubular Steel (1x1)", price: 480 }
-            ];
         }
     }
 
@@ -1173,7 +1134,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "Material_Library_Backup.json");
+        downloadAnchorNode.setAttribute("download", "library.json"); // Now downloads directly as library.json
         document.body.appendChild(downloadAnchorNode); 
         downloadAnchorNode.click(); downloadAnchorNode.remove();
     }
