@@ -378,7 +378,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.6 (The Whitelist Update)
+    Build v4.7 (CleanURI Test)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -1023,7 +1023,7 @@
     }
 
     // =========================================================================
-    // V4.6 THE WHITELIST UPDATE (Anti-Virus / Brave Shield Bypass)
+    // V4.7 CleanURI Priority Test
     // =========================================================================
     function openShareCenter(makeViewOnly = false) {
         const exportData = extractCurrentProjectData(true); 
@@ -1082,22 +1082,9 @@
             return;
         }
 
-        // Waterfall Attempt 1: TinyURL (Most trusted globally, ignores AV blocks)
+        // Waterfall Attempt 1: CleanURI (Moved to front based on request)
         try {
-            statusBox.innerHTML = "⏳ Attempting Server 1 (TinyURL - Firewall Safe)...";
-            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(cachedLongShareLink))}`);
-            if (res.ok) {
-                const text = await res.text();
-                if (text && text.includes('tinyurl.com')) {
-                    applyShortLink(text, "✅ Success via TinyURL!<br><span style='color:var(--text-muted); font-size:11px; font-weight:normal;'>Note: TinyURL may show a 10-second 'Preview' page to the person clicking it, but it will safely bypass your network's Antivirus block.</span>");
-                    return;
-                }
-            }
-        } catch (e) { console.warn("Waterfall 1 failed:", e); }
-
-        // Waterfall Attempt 2: CleanURI
-        try {
-            statusBox.innerHTML = "⏳ Attempting Server 2 (CleanURI)...";
+            statusBox.innerHTML = "⏳ Attempting Server 1 (CleanURI API)...";
             const res = await fetch('https://corsproxy.io/?https://cleanuri.com/api/v1/shorten', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1107,6 +1094,19 @@
             if (data.result_url) {
                 applyShortLink(data.result_url, "✅ Success via CleanURI!");
                 return;
+            }
+        } catch (e) { console.warn("CleanURI failed:", e); }
+
+        // Waterfall Attempt 2: TinyURL
+        try {
+            statusBox.innerHTML = "⏳ CleanURI failed. Attempting Server 2 (TinyURL)...";
+            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(cachedLongShareLink))}`);
+            if (res.ok) {
+                const text = await res.text();
+                if (text && text.includes('tinyurl.com')) {
+                    applyShortLink(text, "✅ Success via TinyURL!<br><span style='color:var(--text-muted); font-size:11px; font-weight:normal;'>Note: TinyURL may show a 10-second 'Preview' page to the person clicking it, but it will safely bypass your network's Antivirus block.</span>");
+                    return;
+                }
             }
         } catch (e) { console.warn("Waterfall 2 failed:", e); }
 
