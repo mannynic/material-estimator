@@ -108,24 +108,12 @@
         .print-img-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; text-align: right; }
 
         #imagePreview { width: 100%; height: 160px; max-height: 160px; border-radius: 12px; display: flex; justify-content: flex-end; align-items: flex-start; overflow: hidden; }
-        #imagePreview img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; object-position: right top; border-radius: 8px; }
+        #imagePreview img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; object-position: right top; border-radius: 8px; transition: transform 0.2s; }
+        #imagePreview img:hover { transform: scale(1.02); }
 
-        .pdf-upload-section {
-            margin-top: 15px;
-            padding: 15px;
-            background: #fcfcfd;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-        }
-
+        .pdf-upload-section { margin-top: 15px; padding: 15px; background: #fcfcfd; border: 1px solid var(--border-color); border-radius: 12px; }
         .print-na { display: none; }
-
-        hr.main-separator {
-            border: none;
-            border-top: 4px solid #000;
-            margin: 35px 0 10px 0;
-            border-radius: 2px;
-        }
+        hr.main-separator { border: none; border-top: 4px solid #000; margin: 35px 0 10px 0; border-radius: 2px; }
 
         #tableContainer { margin-top: 20px; }
         
@@ -142,19 +130,16 @@
         
         tr.item-row td { padding: 12px 8px; border-bottom: 1px solid var(--border-color); }
         td input.item-input, td select.item-input { padding: 10px 12px; font-size: 13px; }
-
         .section-summary-row td { background-color: #fcfcfd; border-top: 1px dashed var(--border-color); border-bottom: 2px solid var(--border-color) !important; }
 
         .suggestions-box {
             position: absolute; top: calc(100% + 4px); left: 0; width: 100%; background: var(--card-color);
-            border: 1px solid var(--border-color); border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; max-height: 220px; overflow-y: auto;
+            border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; max-height: 300px; overflow-y: auto;
         }
-        .suggestion-item {
-            padding: 12px 14px; font-size: 13px; color: var(--text-main); cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.1s;
-        }
+        .suggestion-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
         .suggestion-item:last-child { border-bottom: none; }
         .suggestion-item:hover { background-color: var(--ios-blue); color: #fff; }
+        .suggestion-item:hover .sugg-subtext { color: #e5e5ea !important; }
 
         .section-input {
             width: 100%; background: transparent; border: none; font-weight: 800; font-size: 16px; 
@@ -164,20 +149,12 @@
         .section-input:focus { box-shadow: none; background: transparent; }
         .section-input::placeholder { color: #c7c7cc; font-weight: 600; }
         
-        .mult-container {
-            display: flex; align-items: center; background: var(--ios-gray); padding: 6px 12px; 
-            border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0; margin-left: 15px;
-        }
-
+        .mult-container { display: flex; align-items: center; background: var(--ios-gray); padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border-color); flex-shrink: 0; margin-left: 15px; }
         .section-img-wrapper { display: flex; align-items: center; gap: 10px; padding: 4px; border-radius: 10px; border: 2px dashed transparent; transition: all 0.2s ease; flex-shrink: 0;}
 
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; 
-            padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s ease; 
-            margin-right: 6px; margin-bottom: 10px; font-family: inherit;
-        }
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.2s ease; margin-right: 6px; margin-bottom: 10px; font-family: inherit; }
         .btn:active { transform: scale(0.97); }
-        
         .btn-primary { background-color: var(--ios-blue); color: white; }
         .btn-primary:hover { background-color: var(--ios-blue-hover); }
         .btn-success { background-color: var(--ios-green); color: white; }
@@ -196,7 +173,6 @@
         .btn-pdf:hover { background-color: #000; }
         .btn-projects { background-color: rgba(255, 149, 0, 0.15); color: #d97d00; }
         .btn-projects:hover { background-color: rgba(255, 149, 0, 0.25); }
-        
         .btn-remove { background-color: rgba(255, 59, 48, 0.1); color: var(--ios-red); padding: 8px 12px; border-radius: 8px; font-size: 13px; margin: 0; }
         .btn-remove:hover { background-color: rgba(255, 59, 48, 0.2); }
         
@@ -206,38 +182,66 @@
         .summary p { margin: 8px 0; color: var(--text-muted); font-weight: 500; }
         .grand-total { font-size: 28px !important; font-weight: 700 !important; color: var(--text-main) !important; margin-top: 15px !important; padding-top: 15px; border-top: 1px solid var(--border-color); }
 
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background-color: var(--card-color); padding: 35px; border-radius: 20px; width: 80%; max-width: 800px; max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column;
-        }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal-content { background-color: var(--card-color); padding: 35px; border-radius: 20px; width: 80%; max-width: 900px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; }
         .close-modal { float: right; font-size: 28px; font-weight: 300; cursor: pointer; color: var(--text-muted); line-height: 1; margin-top: -5px; }
         .close-modal:hover { color: var(--text-main); }
         
-        .backup-section { margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .backup-section { margin-top: 30px; padding-top: 25px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;}
 
-        .project-card {
-            background: #fafafa; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 20px; margin-bottom: 10px; 
-            display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;
-        }
+        .project-card { background: #fafafa; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
         .project-card:hover { border-color: var(--ios-blue); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .project-info h3 { margin: 0 0 5px 0; font-size: 16px; color: var(--text-main); }
         .project-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
 
-        /* --- Drag and Drop Library Styles --- */
-        .drag-row { cursor: grab; background-color: transparent; transition: all 0.2s; }
-        .drag-row:active { cursor: grabbing; }
-        .drag-row.dragging { opacity: 0.4; background-color: var(--ios-gray); border-radius: 8px; }
-        .drag-row.drag-over { border-top: 2px solid var(--ios-blue); }
-        .drag-handle { color: #d2d2d7; font-size: 18px; user-select: none; padding: 12px 10px; vertical-align: middle; }
-        .drag-row:hover .drag-handle { color: var(--text-muted); }
-
-        .search-bar-wrapper { margin-bottom: 20px; position: relative; }
+        .search-bar-wrapper { margin-bottom: 20px; position: relative; flex-shrink: 0;}
         .search-bar-wrapper input { padding-left: 40px; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+
+        /* --- Drag Handle Styling --- */
+        .drag-handle { 
+            color: #c7c7cc; cursor: grab; user-select: none; font-weight: bold; 
+            letter-spacing: -2px; transition: color 0.2s; padding: 5px; 
+            display: inline-block; width: 14px; text-align: center;
+        }
+        .drag-handle:hover { color: var(--ios-blue); }
+        .drag-handle:active { cursor: grabbing; color: var(--ios-blue); }
+        
+        /* Table row drag styling */
+        .doc-drag-over td { border-top: 2px solid var(--ios-blue) !important; background: rgba(0, 122, 255, 0.02); }
+
+        /* --- V5.6 Tree View Architecture --- */
+        .tree-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; user-select: none; }
+        .tree-group-wrap { margin-bottom: 4px; }
+        .tree-group-header { display: flex; align-items: center; background: #f5f5f7; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; transition: background 0.1s; }
+        .tree-group-header.drag-over { border: 2px dashed var(--ios-blue); background: rgba(0,122,255,0.05); }
+        
+        .tree-toggle { width: 16px; height: 16px; line-height: 14px; text-align: center; border: 1px solid #a1a1a6; background: #fff; font-size: 14px; font-weight: bold; color: #1d1d1f; cursor: pointer; margin-right: 8px; margin-left: 4px; border-radius: 2px; }
+        
+        .tree-item-list { padding-left: 20px; list-style: none; margin: 4px 0 10px 0; display: none; border-left: 1px dotted #a1a1a6; margin-left: 17px; }
+        .tree-group-wrap.open .tree-item-list { display: block; }
+        
+        .tree-item { display: flex; align-items: center; padding: 4px 8px; gap: 8px; border: 1px solid transparent; border-radius: 4px; transition: background 0.1s; position: relative; }
+        .tree-item:hover { background: #fafafa; border-color: #d2d2d7; }
+        .tree-item.drag-over { border-top: 2px solid var(--ios-blue); }
+
+        .tree-line { color: #a1a1a6; margin-right: 4px; font-family: monospace; }
+        
+        .tree-thumb { width: 24px; height: 24px; border-radius: 4px; background: #e5e5ea; border: 1px solid #c7c7cc; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; flex-shrink: 0; }
+        .tree-thumb:hover::after { content: '📷'; position: absolute; background: rgba(0,0,0,0.5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; }
+        .tree-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .tree-input { border: 1px solid transparent; background: transparent; font-size: 13px; color: var(--text-main); padding: 4px 6px; border-radius: 4px; transition: all 0.1s; font-family: inherit; width: 100%; }
+        .tree-input:hover { border-color: #d2d2d7; }
+        .tree-input:focus { border-color: var(--ios-blue); background: #fff; outline: none; }
+        
+        .tree-actions { display: none; gap: 4px; flex-shrink: 0; }
+        .tree-item:hover .tree-actions { display: flex; }
+        .tree-group-header:hover .tree-actions { display: flex; margin-left: auto; }
+        
+        .t-btn { background: transparent; border: none; cursor: pointer; font-size: 14px; padding: 4px; border-radius: 4px; color: var(--text-muted); }
+        .t-btn:hover { background: #e5e5ea; color: var(--text-main); }
+        .t-btn.del:hover { background: rgba(255,59,48,0.1); color: var(--ios-red); }
 
         /* Share Modal Specifics */
         .share-input-box { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; font-family: monospace; font-size: 12px; margin-bottom: 15px; color: var(--text-main); resize: none; overflow: hidden; }
@@ -248,48 +252,31 @@
             .container { box-shadow: none; padding: 0; max-width: 100%; }
             .no-print { display: none !important; }
             .summary { background: transparent; border: none; padding-right: 0; }
-            
             input[type="text"], input[type="number"], input[type="date"], select, textarea { border: none; background: transparent; padding: 0; font-size: 14px; color: #000; appearance: none; }
             .top-input { border-bottom: 2px solid #000 !important; border-radius: 0 !important; color: #000 !important; }
-            
             .print-img-label { color: #000 !important; border-bottom: 1px solid #000; padding-bottom: 2px; display: inline-block; font-size: 9px; }
             .print-na { display: block !important; color: #86868b; font-size: 13px; margin-top: 8px;}
-            
             .print-only-desc { display: block !important; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; color: #000; padding: 2px 0; line-height: 1.4; }
-            
-            hr.main-separator {
-                border-top: 4px solid #000 !important;
-                margin: 25px 0 20px 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
+            hr.main-separator { border-top: 4px solid #000 !important; margin: 25px 0 20px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             #tableContainer { margin-top: 30px !important; }
-            
             .section-row td { background-color: transparent !important; padding-top: 25px !important; padding-bottom: 0 !important; border-bottom: none !important; }
             tr.item-row td { border-bottom: 1px solid #d2d2d7 !important; padding: 8px !important; vertical-align: top !important;}
             .section-labels-row th { border-bottom: 2px solid #000 !important; color: #000 !important; font-size: 10px !important; padding: 6px 8px !important; }
-            
             .section-input { font-size: 14px !important; color: #000 !important; border-bottom: none !important; padding: 0 0 5px 0;}
             .section-summary-row td { background-color: transparent !important; }
-            
             .mult-container { background: transparent !important; border: none !important; padding: 0 !important; margin-left: 10px !important;}
             .section-multiplier { background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-size: 14px !important; }
-
             input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
             .grid-header { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px; }
-            
             #imagePreview { height: 220px !important; }
             #imagePreview img { max-height: 220px !important; max-width: 400px !important; }
             .sec-img-preview { display: block !important; height: 100px !important; max-width: 280px !important; object-fit: contain !important; border-radius: 4px !important; }
-            
             td select.item-input { color: #555; padding:0;}
             .remove-cut-btn { display: none !important; }
-            
-            /* Prevent price text clipping */
             td input.item-input { width: 100%; box-sizing: border-box; font-size: 13px !important; }
             .item-input.price { min-width: 65px; }
             .pdf-upload-section { border: none; background: transparent; padding: 0; margin: 0;}
+            .doc-thumb-box { border: 1px solid #d2d2d7 !important; background: transparent !important; }
         }
     </style>
 </head>
@@ -300,6 +287,11 @@
     <option value="sqft"></option><option value="sht"></option><option value="set"></option>
     <option value="roll"></option><option value="ft"></option><option value="m"></option>
 </datalist>
+
+<div id="lightboxModal" class="modal no-print" onclick="closeModal('lightboxModal')" style="cursor: zoom-out;">
+    <span class="close-modal" style="position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; opacity: 0.8;">&times;</span>
+    <img id="lightboxImage" src="" style="max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);" onclick="event.stopPropagation()">
+</div>
 
 <div id="shareCenterModal" class="modal no-print">
     <div class="modal-content" style="max-width: 600px;">
@@ -318,47 +310,39 @@
         <div class="shortener-panel">
             <h4 style="margin: 0 0 10px 0; color: var(--text-main);">Want a shorter link?</h4>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">If your network blocks APIs, click the button below. Our server will attempt to bypass your firewall automatically.</p>
-            
-            <button class="btn btn-manage" id="autoShortenBtn" onclick="runShortenerWaterfall()">🪄 Attempt Auto-Shorten</button>
+            <button class="btn btn-manage" id="autoShortenBtn" onclick="runShortenerWaterfall()">🪄 Generate TinyURL</button>
             <div id="shortenWaterfallStatus" style="font-size: 13px; font-weight: 600; margin-top: 15px; color: var(--ios-blue);"></div>
         </div>
     </div>
 </div>
 
 <div id="libraryModal" class="modal no-print">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 900px; height: 85vh;">
         <div>
             <span class="close-modal" onclick="closeModal('libraryModal')">&times;</span>
-            <h2 style="margin-top: 0; font-weight: 700; letter-spacing: -0.5px;">Manage Library</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 15px;">Drag items up or down to reorder them. Changes save automatically locally. To update the master file for sharing, download the backup and upload it as <b>library.json</b> to your GitHub.</p>
+            <h2 style="margin-top: 0; font-weight: 700; letter-spacing: -0.5px;">Tool Database / Library</h2>
+            <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Grab the <span style="font-weight:bold; color:var(--text-main)">⋮⋮</span> drag handle to move folders and materials. Upload material thumbs here.</p>
         </div>
         
         <div class="search-bar-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="text" id="librarySearchInput" class="item-input" placeholder="Search materials..." oninput="renderLibraryManager(this.value)">
+            <input type="text" id="librarySearchInput" class="item-input" placeholder="Search materials..." oninput="renderLibraryTree(this.value)">
         </div>
 
-        <div style="flex-grow: 1; overflow-y: auto; margin-bottom: 20px;">
-            <table id="libraryManagerTable" style="margin-top: 0; margin-bottom: 10px; width: 100%;">
-                <thead>
-                    <tr>
-                        <th width="5%" style="border-bottom: 2px solid var(--border-color);"></th>
-                        <th width="55%" style="border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Material Description</th>
-                        <th width="25%" style="border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Unit Price (₱)</th>
-                        <th width="15%" style="border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="libraryManagerBody"></tbody>
-            </table>
-            <button class="btn btn-primary" onclick="addNewLibraryItem()">+ Create Blank Item</button>
+        <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+            <button class="btn btn-section" style="margin:0;" onclick="createTreeGroup()">📁 New Group</button>
+            <button class="btn btn-primary" style="margin:0;" onclick="createTreeItem()">📄 New Material</button>
         </div>
+
+        <div id="libraryManagerBody" class="tree-container" style="flex-grow: 1; overflow-y: auto; margin-bottom: 20px; padding-right: 5px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: #fff;"></div>
+
         <div class="backup-section">
             <div>
-                <span style="font-weight: 600; color: var(--text-main); display: block;">Library Backup</span>
-                <span style="color: var(--text-muted); font-size: 13px;">Download or restore your saved materials.</span>
+                <span style="font-weight: 600; color: var(--text-main); display: block;">Library Master Backup</span>
+                <span style="color: var(--text-muted); font-size: 13px;">Download to share with team, or upload to restore.</span>
             </div>
             <div>
-                <button class="btn btn-manage" onclick="exportLibraryBackup()">📥 Download Backup</button>
+                <button class="btn btn-manage" onclick="exportLibraryBackup()">📥 Backup (.json)</button>
                 <button class="btn btn-manage" onclick="document.getElementById('importLibraryInput').click()" style="margin-right: 0;">📤 Restore</button>
                 <input type="file" id="importLibraryInput" accept=".json" style="display: none;" onchange="importLibraryBackup(event)">
             </div>
@@ -378,7 +362,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v4.7 (CleanURI Test)
+    Build v5.6 (Read-Only Row Thumbs & Lightbox)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -389,10 +373,11 @@
 
     <div class="header-actions no-print">
         <h1>Project Material Estimator</h1>
-        <div>
-            <button class="btn btn-section" onclick="window.open(window.location.href.split('?')[0], '_blank')">📄 New Document</button>
-            <button class="btn btn-projects" onclick="openProjectsManager()">📂 My Projects</button>
-            <button class="btn btn-success" onclick="saveCurrentProject()" id="saveJoBtn" style="margin-right: 0;">💾 Save Project</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="autosaveStatus" style="font-size: 11px; font-weight: 600; color: var(--text-muted); opacity: 0; transition: opacity 0.3s;">Saved Just Now</span>
+            <button class="btn btn-section" onclick="window.open(window.location.href.split('?')[0], '_blank')" style="margin-bottom:0;">📄 New Document</button>
+            <button class="btn btn-projects" onclick="openProjectsManager()" style="margin-bottom:0;">📂 My Projects</button>
+            <button class="btn btn-success" onclick="saveCurrentProject(false)" id="saveJoBtn" style="margin: 0;">💾 Save Project</button>
         </div>
     </div>
     
@@ -446,8 +431,7 @@
     <div id="tableContainer">
         <table id="materialsTable">
             <colgroup>
-                <col width="32%"> <col width="18%"> <col width="14%"> <col width="16%"> <col width="15%"> <col width="5%" class="no-print">
-            </colgroup>
+                <col width="3%" class="no-print"> <col width="28%"> <col width="19%"> <col width="14%"> <col width="16%"> <col width="15%"> <col width="5%" class="no-print"> </colgroup>
             <tbody>
                 </tbody>
         </table>
@@ -490,25 +474,39 @@
     let saveTimeout;
     let isViewOnlyMode = false;
 
-    let savedMaterials = [];
+    let savedMaterials = []; 
     let savedProjects = [];
     let currentImageData = null; 
     let currentProjectId = null;
-    let dragSrcEl = null;
     
-    // Store generated long link globally for the Share Center
+    // AutoSave / Closing Warning Trackers
     let cachedLongShareLink = "";
+    let hasUnsavedChanges = false;
+    let autoSaveTimer;
 
-    // --- UNDO / REDO ENGINE ---
+    // --- UNDO / REDO & AUTOSAVE ENGINE ---
+    function markUnsaved() {
+        if(isViewOnlyMode) return;
+        hasUnsavedChanges = true;
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => { if(currentProjectId && hasUnsavedChanges) saveCurrentProject(true); }, 5000);
+    }
+
+    window.addEventListener("beforeunload", function (e) {
+        if (hasUnsavedChanges && !isViewOnlyMode) {
+            var confirmationMessage = "You have unsaved changes in your document. Are you sure you want to leave?";
+            (e || window.event).returnValue = confirmationMessage;
+            return confirmationMessage;
+        }
+    });
+
     function saveState() {
         if (isRestoring || isViewOnlyMode) return; 
         const currentState = extractCurrentProjectData(false); 
-        
         if (historyStack.length > 0) {
             const lastState = historyStack[historyStack.length - 1];
             if (JSON.stringify(lastState) === JSON.stringify(currentState)) return;
         }
-        
         historyStack.push(currentState);
         if (historyStack.length > 50) historyStack.shift(); 
         redoStack = []; 
@@ -519,9 +517,7 @@
         isRestoring = true;
         const currentState = historyStack.pop();
         redoStack.push(currentState);
-        
-        const previousState = historyStack[historyStack.length - 1];
-        loadProjectToScreen(previousState);
+        loadProjectToScreen(historyStack[historyStack.length - 1]);
     }
 
     function redo() {
@@ -529,128 +525,69 @@
         isRestoring = true;
         const nextState = redoStack.pop();
         historyStack.push(nextState);
-        
         loadProjectToScreen(nextState);
     }
 
     document.addEventListener('keydown', function(e) {
         if (isViewOnlyMode) return;
         if (e.ctrlKey || e.metaKey) {
-            if (e.key.toLowerCase() === 'z') {
-                e.preventDefault();
-                if (e.shiftKey) { redo(); } else { undo(); }
-            } else if (e.key.toLowerCase() === 'y') {
-                e.preventDefault();
-                redo();
-            }
+            if (e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+            else if (e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
         }
     });
 
     document.addEventListener('input', (e) => {
         if (isViewOnlyMode) return;
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveState, 800);
+            markUnsaved(); clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 800);
         }
     });
 
     document.addEventListener('change', (e) => {
         if (isViewOnlyMode) return;
-        if (e.target.tagName === 'SELECT' || e.target.type === 'checkbox') {
-            saveState();
-        }
+        if (e.target.tagName === 'SELECT' || e.target.type === 'checkbox') { markUnsaved(); saveState(); }
     });
 
     // --- SMART AREA/DIMENSION ENGINE ---
     function parseQuantity(str, targetUom = "") {
-        if (!str) return 0;
-        str = str.toString().toLowerCase().trim();
-        targetUom = targetUom.toLowerCase().trim();
-
+        if (!str) return 0; str = str.toString().toLowerCase().trim(); targetUom = targetUom.toLowerCase().trim();
         if (str.includes('x') || str.includes('*')) {
             let parts = str.replace(/\*/g, 'x').split('x').map(p => p.trim());
-            
             let inputUnit = null;
-            if (str.includes('cm')) inputUnit = 'cm';
-            else if (str.includes('mm')) inputUnit = 'mm';
-            else if (str.includes('in') || str.includes('"')) inputUnit = 'in';
-            else if (str.includes('ft') || str.includes("'")) inputUnit = 'ft';
-            else if (str.includes('m') && !str.includes('mm') && !str.includes('cm')) inputUnit = 'm';
-
+            if (str.includes('cm')) inputUnit = 'cm'; else if (str.includes('mm')) inputUnit = 'mm'; else if (str.includes('in') || str.includes('"')) inputUnit = 'in'; else if (str.includes('ft') || str.includes("'")) inputUnit = 'ft'; else if (str.includes('m') && !str.includes('mm') && !str.includes('cm')) inputUnit = 'm';
             let vals = parts.map(p => parseFloat(p.replace(/[^0-9.]/g, '')) || 0);
             if (vals.length !== 2) return vals.reduce((a, b) => a * b, 1);
-            
             let area = vals[0] * vals[1];
-
             if (!inputUnit) {
-                if (targetUom === 'sqm') inputUnit = 'cm';
-                else if (targetUom === 'sqft' || targetUom === 'sq.ft' || targetUom === 'sqin' || targetUom === 'sq.in') inputUnit = 'in';
-                else if (targetUom === 'sht' || targetUom === 'sheet') inputUnit = 'in';
-                else inputUnit = 'raw';
+                if (targetUom === 'sqm') inputUnit = 'cm'; else if (targetUom === 'sqft' || targetUom === 'sq.ft' || targetUom === 'sqin' || targetUom === 'sq.in') inputUnit = 'in'; else if (targetUom === 'sht' || targetUom === 'sheet') inputUnit = 'in'; else inputUnit = 'raw';
             }
-
-            let areaInSqMeters = 0;
-            let areaInSqFeet = 0;
-            let areaInSqInches = 0;
-
-            if (inputUnit === 'cm') {
-                areaInSqMeters = area / 10000;
-                areaInSqFeet = area / 929.03;
-                areaInSqInches = area * 0.15500031;
-            } else if (inputUnit === 'mm') {
-                areaInSqMeters = area / 1000000;
-                areaInSqFeet = area / 92903;
-                areaInSqInches = area * 0.0015500031;
-            } else if (inputUnit === 'in') {
-                areaInSqMeters = area * 0.00064516;
-                areaInSqFeet = area / 144;
-                areaInSqInches = area;
-            } else if (inputUnit === 'ft') {
-                areaInSqMeters = area * 0.092903;
-                areaInSqFeet = area;
-                areaInSqInches = area * 144;
-            } else if (inputUnit === 'm') {
-                areaInSqMeters = area;
-                areaInSqFeet = area * 10.7639;
-                areaInSqInches = area * 1550.0031;
-            } else {
-                return area; 
-            }
+            let areaInSqMeters = 0, areaInSqFeet = 0, areaInSqInches = 0;
+            if (inputUnit === 'cm') { areaInSqMeters = area / 10000; areaInSqFeet = area / 929.03; areaInSqInches = area * 0.15500031; } else if (inputUnit === 'mm') { areaInSqMeters = area / 1000000; areaInSqFeet = area / 92903; areaInSqInches = area * 0.0015500031; } else if (inputUnit === 'in') { areaInSqMeters = area * 0.00064516; areaInSqFeet = area / 144; areaInSqInches = area; } else if (inputUnit === 'ft') { areaInSqMeters = area * 0.092903; areaInSqFeet = area; areaInSqInches = area * 144; } else if (inputUnit === 'm') { areaInSqMeters = area; areaInSqFeet = area * 10.7639; areaInSqInches = area * 1550.0031; } else { return area; }
 
             if (targetUom === 'sqm') return areaInSqMeters;
             if (targetUom === 'sqft' || targetUom === 'sq.ft') return areaInSqFeet;
             if (targetUom === 'sqin' || targetUom === 'sq.in') return areaInSqInches;
             if (targetUom === 'sht' || targetUom === 'sheet') return areaInSqFeet / 32; 
-            
             return area; 
         }
-
         if (str.includes('/')) {
-            let parts = str.split(' ');
-            let fractionPart = parts.length > 1 ? parts[1] : parts[0];
-            let wholePart = parts.length > 1 ? parseFloat(parts[0]) : 0;
-            let [num, den] = fractionPart.split('/');
-            let dec = (parseFloat(num) || 0) / (parseFloat(den) || 1);
-            return wholePart + dec;
+            let parts = str.split(' '); let fractionPart = parts.length > 1 ? parts[1] : parts[0]; let wholePart = parts.length > 1 ? parseFloat(parts[0]) : 0; let [num, den] = fractionPart.split('/'); let dec = (parseFloat(num) || 0) / (parseFloat(den) || 1); return wholePart + dec;
         }
-
         return parseFloat(str) || 0;
     }
 
-    // --- CURRENCY FORMATTERS ---
     function formatPriceField(input) {
         let v = parseFloat(input.value.replace(/[^0-9.-]/g, ''));
-        if (!isNaN(v)) {
-            input.value = '₱' + v.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        } else {
-            input.value = '';
-        }
-        calculate();
-        if (!isRestoring) saveState();
+        if (!isNaN(v)) { input.value = '₱' + v.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}); } else { input.value = ''; }
+        calculate(); if (!isRestoring) saveState();
     }
-    
-    function unformatPriceField(input) {
-        input.value = input.value.replace(/[^0-9.]/g, '');
+    function unformatPriceField(input) { input.value = input.value.replace(/[^0-9.]/g, ''); }
+
+    // --- UNIVERSAL LIGHTBOX ENGINE ---
+    function openLightbox(src) {
+        if (!src) return;
+        document.getElementById('lightboxImage').src = src;
+        document.getElementById('lightboxModal').style.display = 'flex';
     }
 
     // --- HYBRID IMAGE ENGINE ---
@@ -659,14 +596,9 @@
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 500; 
-                let width = img.width;
-                let height = img.height;
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 500; let width = img.width, height = img.height;
                 if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                 callback(canvas.toDataURL('image/jpeg', 0.5));
             }
             img.src = e.target.result;
@@ -676,487 +608,396 @@
 
     function uploadImage(file, labelElement, callback) {
         if (IMGBB_API_KEY && IMGBB_API_KEY.trim() !== "") {
-            let formData = new FormData();
-            formData.append("image", file);
+            let formData = new FormData(); formData.append("image", file);
+            let isThumbBox = labelElement.classList && labelElement.classList.contains('tree-thumb');
+            let originalContent = labelElement.innerHTML;
             
-            let originalText = labelElement.innerText;
-            let iconSpan = labelElement.querySelector('span');
-            if(iconSpan) {
-                originalText = labelElement.innerHTML;
-                labelElement.innerHTML = `<span style="display:block;">⏳</span>Uploading to Cloud...`;
-            } else {
-                labelElement.innerText = "⏳ Uploading...";
-            }
+            if(isThumbBox) { labelElement.innerHTML = `<span style="font-size:10px;">⏳</span>`; } 
+            else { let iconSpan = labelElement.querySelector('span'); if(iconSpan) labelElement.innerHTML = `<span style="display:block;">⏳</span>Uploading...`; else labelElement.innerText = "⏳ Uploading..."; }
 
-            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(iconSpan) labelElement.innerHTML = originalText; else labelElement.innerText = originalText;
-                if(data.success) { callback(data.data.url); }
-                else { alert("Upload failed."); }
-            }).catch(err => {
-                if(iconSpan) labelElement.innerHTML = originalText; else labelElement.innerText = originalText;
-                alert("Upload error.");
-            });
-        } else {
-            compressImage(file, callback);
-        }
+            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData })
+            .then(res => res.json()).then(data => {
+                if(data.success) { callback(data.data.url); } else { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload failed."); }
+            }).catch(err => { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload error."); });
+        } else { compressImage(file, callback); }
     }
 
-    // --- GOOGLE DRIVE LINK HANDLER ---
     function updateLayoutLinkUI() {
-        const link = document.getElementById('layoutLinkInput').value.trim();
-        const display = document.getElementById('layoutLinkDisplay');
-        const anchor = document.getElementById('clickableLayoutLink');
-        
-        if(link) {
-            display.style.display = 'flex';
-            let finalLink = link;
-            if(!finalLink.startsWith('http')) finalLink = 'https://' + finalLink;
-            anchor.href = finalLink;
-        } else {
-            display.style.display = 'none';
-        }
+        const link = document.getElementById('layoutLinkInput').value.trim(); const display = document.getElementById('layoutLinkDisplay'); const anchor = document.getElementById('clickableLayoutLink');
+        if(link) { display.style.display = 'flex'; let finalLink = link; if(!finalLink.startsWith('http')) finalLink = 'https://' + finalLink; anchor.href = finalLink; } else { display.style.display = 'none'; }
     }
 
-    // --- CLOUD LIBRARY LOADER ---
+    // --- V5.6 BULLETPROOF TREE DATA MIGRATION ---
+    function generateId() { return Math.random().toString(36).substr(2, 9); }
+
+    function loadDefaultTree() {
+        savedMaterials = [
+            { id: generateId(), type: 'group', name: 'Board Materials', isOpen: true, items: [ { id: generateId(), name: "Sintra Board (White, 5mm)", price: 850, img: "" } ]},
+            { id: generateId(), type: 'group', name: 'Acrylics', isOpen: true, items: [ { id: generateId(), name: "Acrylic Sheet (Clear, 3mm)", price: 1500, img: "" } ]},
+            { id: generateId(), type: 'group', name: 'Prints & Stickers', isOpen: true, items: [ { id: generateId(), name: "Vinyl Sticker (Matte)", price: 350, img: "" }, { id: generateId(), name: "Printed Sticker", price: 1.00, img: "" } ]},
+            { id: generateId(), type: 'group', name: 'Lighting', isOpen: true, items: [ { id: generateId(), name: "LED Modules", price: 45, img: "" } ]}
+        ]; saveStorage();
+    }
+
+    function migrateAndSetLibrary(data) {
+        if (!Array.isArray(data) || data.length === 0) { loadDefaultTree(); return; }
+        if (data[0] && !data[0].hasOwnProperty('type') && !data[0].hasOwnProperty('items')) {
+            let grouped = {};
+            data.forEach(m => { if(!m) return; let g = m.group || "Uncategorized Materials"; if(!grouped[g]) grouped[g] = []; grouped[g].push({ id: generateId(), name: m.name || "Unnamed Material", price: parseFloat(m.price)||0, img: m.img || "" }); });
+            let newTree = []; for (let g in grouped) { newTree.push({ id: generateId(), type: 'group', name: g, isOpen: true, items: grouped[g] }); }
+            savedMaterials = newTree; saveStorage();
+        } else { savedMaterials = data.map(g => ({ ...g, items: Array.isArray(g.items) ? g.items : [] })); }
+    }
+
     async function loadLibrary() {
         try {
             const response = await fetch('library.json?t=' + new Date().getTime());
-            if (response.ok) {
-                savedMaterials = await response.json();
-                localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials));
-                return;
-            }
-        } catch (error) {
-            console.warn("Could not load master library from GitHub. Falling back to local storage.", error);
-        }
-
-        const stored = localStorage.getItem('materialEstimatorLibrary');
-        if (stored) { 
-            savedMaterials = JSON.parse(stored); 
-        } else {
-            savedMaterials = [
-                { name: "Acrylic Sheet (Clear, 3mm)", price: 1500 }, 
-                { name: "Sintra Board (White, 5mm)", price: 850 },
-                { name: "LED Modules", price: 45 }, 
-                { name: "Vinyl Sticker (Matte)", price: 350 }, 
-                { name: "Printed Sticker", price: 1.00 },
-                { name: "Tubular Steel (1x1)", price: 480 }
-            ];
-        }
+            if (response.ok) { let data = await response.json(); migrateAndSetLibrary(data); return; }
+        } catch (error) { console.warn("Could not load master library from GitHub. Falling back to local storage."); }
+        try {
+            const stored = localStorage.getItem('materialEstimatorLibrary');
+            if (stored) { migrateAndSetLibrary(JSON.parse(stored)); } else { loadDefaultTree(); }
+        } catch(e) { loadDefaultTree(); }
     }
 
     function loadProjects() {
-        try {
-            const stored = localStorage.getItem('materialEstimatorProjects');
-            if (stored) {
-                savedProjects = JSON.parse(stored);
-            } else {
-                savedProjects = [];
-            }
-        } catch (error) {
-            console.error("Could not load saved projects:", error);
-            savedProjects = [];
-        }
+        try { const stored = localStorage.getItem('materialEstimatorProjects'); if (stored) savedProjects = JSON.parse(stored); else savedProjects = []; } catch (error) { savedProjects = []; }
     }
 
     window.onload = async function() {
-        await loadLibrary(); 
-        loadProjects(); 
-        
-        const currentUrl = new URL(window.location.href);
-        let sharedData = currentUrl.searchParams.get('data') || currentUrl.searchParams.get('d');
-        let isViewOnly = currentUrl.searchParams.get('view') === '1';
-        
+        await loadLibrary(); loadProjects(); 
+        const currentUrl = new URL(window.location.href); let sharedData = currentUrl.searchParams.get('data') || currentUrl.searchParams.get('d'); let isViewOnly = currentUrl.searchParams.get('view') === '1';
         if (sharedData) {
             try {
-                isViewOnlyMode = isViewOnly;
-
-                let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
-                
-                if (!decodedString) {
-                     decodedString = LZString.decompressFromBase64(sharedData.replace(/ /g, '+'));
-                }
-
-                if (!decodedString) {
-                     throw new Error("Data string empty or completely corrupted by chat app truncation.");
-                }
-
-                const decodedData = JSON.parse(decodedString);
-                console.log("Data successfully recovered!");
-                loadProjectToScreen(decodedData);
-                
-                if (!isViewOnlyMode) {
-                    setTimeout(() => { saveState(); }, 100); 
-                    window.history.pushState({}, document.title, window.location.pathname);
-                } else {
-                    lockUIForViewOnly();
-                }
-
-            } catch (e) { 
-                console.error("Load Engine Error:", e); 
-                alert("⚠️ ERROR LOADING DATA\n\nThe link is corrupted. Please generate a new link using this latest code.");
-                setupDefaultTable(); 
-            }
-        } else { 
-            setupDefaultTable(); 
-        }
+                isViewOnlyMode = isViewOnly; let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
+                if (!decodedString) decodedString = LZString.decompressFromBase64(sharedData.replace(/ /g, '+'));
+                if (!decodedString) throw new Error("Data string empty or corrupted.");
+                const decodedData = JSON.parse(decodedString); loadProjectToScreen(decodedData);
+                if (!isViewOnlyMode) { setTimeout(() => { saveState(); }, 100); window.history.pushState({}, document.title, window.location.pathname); } else { lockUIForViewOnly(); }
+            } catch (e) { alert("⚠️ ERROR LOADING DATA"); setupDefaultTable(); }
+        } else { setupDefaultTable(); }
+        
+        // Attach Document Drag Listeners securely
+        const tbody = document.querySelector("#materialsTable tbody");
+        tbody.addEventListener('dragover', docDragOver);
+        tbody.addEventListener('drop', docDrop);
+        tbody.addEventListener('dragenter', (e) => e.preventDefault());
     };
 
     function lockUIForViewOnly() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            el.disabled = true;
-            if(!el.classList.contains('top-input') && !el.classList.contains('section-multiplier')) {
-                el.style.backgroundColor = 'transparent';
-                el.style.border = 'none';
-            }
-            el.style.color = 'var(--text-main)';
-            el.style.webkitTextFillColor = 'var(--text-main)';
-            el.style.opacity = '1'; 
-            el.style.appearance = 'none'; 
+            el.disabled = true; if(!el.classList.contains('top-input') && !el.classList.contains('section-multiplier')) { el.style.backgroundColor = 'transparent'; el.style.border = 'none'; }
+            el.style.color = 'var(--text-main)'; el.style.webkitTextFillColor = 'var(--text-main)'; el.style.opacity = '1'; el.style.appearance = 'none'; 
         });
-
-        document.querySelectorAll('.mult-container').forEach(el => {
-            el.style.background = 'transparent';
-            el.style.border = 'none';
-        });
-
-        const elementsToHide = document.querySelectorAll(`
-            .header-actions button,
-            .actions-bar div:first-child,
-            #saveLibBtn,
-            button[onclick="openLibraryManager()"],
-            .btn-remove,
-            .cut-inactive,
-            .remove-cut-btn,
-            #mainImageDropZone,
-            #layoutInputLabel,
-            #layoutLinkInput,
-            label.no-print,
-            .actions-bar span,
-            .add-material-btn
-        `);
+        document.querySelectorAll('.mult-container').forEach(el => { el.style.background = 'transparent'; el.style.border = 'none'; });
+        
+        // Hiding actionable buttons but keeping handles visible structurally
+        const elementsToHide = document.querySelectorAll(`.header-actions button, .actions-bar div:first-child, #saveLibBtn, button[onclick="openLibraryManager()"], .btn-remove, .cut-inactive, .remove-cut-btn, #mainImageDropZone, #layoutInputLabel, #layoutLinkInput, label.no-print, .actions-bar span, .add-material-btn, .drag-handle`);
+        
         elementsToHide.forEach(el => { if(el) el.style.display = 'none'; });
-
-        document.querySelectorAll('.top-input').forEach(el => {
-            el.style.borderBottom = '1px solid transparent !important';
-        });
-
-        const headerH1 = document.querySelector('.header-actions h1');
-        headerH1.innerHTML += ' <span style="font-size: 13px; font-weight: 700; background: var(--ios-red); color: white; padding: 4px 10px; border-radius: 8px; margin-left: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(255,59,48,0.3);">READ-ONLY</span>';
+        document.querySelectorAll('.top-input').forEach(el => { el.style.borderBottom = '1px solid transparent !important'; });
+        const headerH1 = document.querySelector('.header-actions h1'); headerH1.innerHTML += ' <span style="font-size: 13px; font-weight: 700; background: var(--ios-red); color: white; padding: 4px 10px; border-radius: 8px; margin-left: 12px; letter-spacing: 0.5px;">READ-ONLY</span>';
     }
 
-    function setupDefaultTable() { 
-        isRestoring = true;
-        addSection("WOOD BODY", null, 1); 
-        addRow(); 
-        setTimeout(() => {
-            isRestoring = false;
-            saveState(); 
-        }, 50);
-    }
-    
+    function setupDefaultTable() { isRestoring = true; addSection("WOOD BODY", null, 1); addRow(); setTimeout(() => { isRestoring = false; saveState(); }, 50); }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; calculate(); }
 
     function extractCurrentProjectData(sanitizeForUrl = false) {
-        
-        const safeImage = (imgStr) => {
-            if (!imgStr) return null;
-            if (sanitizeForUrl && imgStr.startsWith('data:image')) return null; 
-            return imgStr;
-        };
-
+        const safeImage = (imgStr) => { if (!imgStr) return null; if (sanitizeForUrl && imgStr.startsWith('data:image')) return null; return imgStr; };
         const exportData = {
             id: currentProjectId || Date.now().toString(),
-            p: document.getElementById('projectName').value || "",
-            l: document.getElementById('location').value,
-            d: document.getElementById('projectDate').value,
-            i: safeImage(currentImageData), 
-            layout: document.getElementById('layoutLinkInput').value.trim(), 
-            rows: [],
+            p: document.getElementById('projectName').value || "", l: document.getElementById('location').value, d: document.getElementById('projectDate').value,
+            i: safeImage(currentImageData), layout: document.getElementById('layoutLinkInput').value.trim(), rows: [],
             total: parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim()) || 0
         };
-        
         const rows = document.querySelectorAll("#materialsTable tbody tr");
         rows.forEach(row => {
             if (row.classList.contains('section-row')) {
-                const imgEl = row.querySelector('.sec-img-preview');
-                const imgSrc = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : null;
-                const multInput = row.querySelector('.section-multiplier');
-                const mult = multInput ? (parseFloat(multInput.value) || 1) : 1;
-                
-                exportData.rows.push({ 
-                    type: 'section', 
-                    title: row.querySelector('.section-input').value, 
-                    img: safeImage(imgSrc),
-                    mult: mult
-                });
+                const imgEl = row.querySelector('.sec-img-preview'); const imgSrc = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : null;
+                const multInput = row.querySelector('.section-multiplier'); const mult = multInput ? (parseFloat(multInput.value) || 1) : 1;
+                exportData.rows.push({ type: 'section', title: row.querySelector('.section-input').value, img: safeImage(imgSrc), mult: mult });
             } else if (row.classList.contains('item-row')) {
                 const isCutActive = row.querySelector('.cut-active').style.display === 'flex';
                 const priceRaw = row.querySelector('.price').value.replace(/[^0-9.]/g, "");
-
-                exportData.rows.push({
-                    type: 'item',
-                    desc: row.querySelector('.desc').value,
-                    hasCut: isCutActive,
-                    cutTime: isCutActive ? row.querySelector('.cut-time').value : "",
-                    cutMachine: isCutActive ? row.querySelector('.cut-machine').value : "Laser",
-                    qty: row.querySelector('.qty').value,
-                    uom: row.querySelector('.uom').value,
-                    price: parseFloat(priceRaw) || 0
+                const thumbImg = row.querySelector('.doc-thumb-box img');
+                exportData.rows.push({ 
+                    type: 'item', desc: row.querySelector('.desc').value, hasCut: isCutActive, cutTime: isCutActive ? row.querySelector('.cut-time').value : "", 
+                    cutMachine: isCutActive ? row.querySelector('.cut-machine').value : "Laser", qty: row.querySelector('.qty').value, uom: row.querySelector('.uom').value, 
+                    price: parseFloat(priceRaw) || 0, thumb: thumbImg ? safeImage(thumbImg.src) : null
                 });
             }
-        });
-        return exportData;
+        }); return exportData;
     }
 
-    function saveCurrentProject() {
+    function saveCurrentProject(silent = false) {
         if (isViewOnlyMode) return;
-        const projectData = extractCurrentProjectData(false); 
-        const existingIndex = savedProjects.findIndex(p => p.id === projectData.id);
-        
-        if (existingIndex !== -1) { savedProjects[existingIndex] = projectData; } 
-        else { savedProjects.push(projectData); currentProjectId = projectData.id; }
-        
-        localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects));
-        
-        const btn = document.getElementById('saveJoBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = "✅ Saved!";
-        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+        const projectData = extractCurrentProjectData(false); const existingIndex = savedProjects.findIndex(p => p.id === projectData.id);
+        if (existingIndex !== -1) { savedProjects[existingIndex] = projectData; } else { savedProjects.push(projectData); currentProjectId = projectData.id; }
+        localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects)); hasUnsavedChanges = false; 
+        if (!silent) {
+            const btn = document.getElementById('saveJoBtn'); const originalText = btn.innerHTML;
+            btn.innerHTML = "✅ Saved!"; setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+        } else {
+            const statusLabel = document.getElementById('autosaveStatus'); const now = new Date();
+            statusLabel.innerText = "Autosaved at " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            statusLabel.style.opacity = "1"; setTimeout(() => { statusLabel.style.opacity = "0"; }, 4000);
+        }
     }
 
     function openProjectsManager() {
-        document.getElementById('projectsModal').style.display = 'flex';
-        const container = document.getElementById('projectsListContainer');
-        container.innerHTML = '';
-        if (savedProjects.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px 0;">No saved projects yet. Click "Save Project" when working on a JO.</p>';
-            return;
-        }
+        document.getElementById('projectsModal').style.display = 'flex'; const container = document.getElementById('projectsListContainer'); container.innerHTML = '';
+        if (savedProjects.length === 0) { container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px 0;">No saved projects yet. Click "Save Project" when working on a JO.</p>'; return; }
         const sortedProjects = [...savedProjects].reverse();
         sortedProjects.forEach(proj => {
-            const card = document.createElement('div');
-            card.className = 'project-card';
-            card.innerHTML = `
-                <div class="project-info">
-                    <h3>${proj.p || 'Untitled Project'}</h3>
-                    <p>${proj.l ? proj.l + ' • ' : ''}${proj.d || 'No Date'} • <b>₱${proj.total.toLocaleString('en-PH', {minimumFractionDigits: 2})}</b></p>
-                </div>
-                <div>
-                    <button class="btn btn-primary" style="margin-bottom:0;" onclick="openSavedProject('${proj.id}')">Open</button>
-                    <button class="btn btn-remove" style="margin-bottom:0;" onclick="deleteSavedProject('${proj.id}')">Delete</button>
-                </div>
-            `;
+            const card = document.createElement('div'); card.className = 'project-card';
+            card.innerHTML = `<div class="project-info"><h3>${proj.p || 'Untitled Project'}</h3><p>${proj.l ? proj.l + ' • ' : ''}${proj.d || 'No Date'} • <b>₱${proj.total.toLocaleString('en-PH', {minimumFractionDigits: 2})}</b></p></div>
+                <div><button class="btn btn-primary" style="margin-bottom:0;" onclick="openSavedProject('${proj.id}')">Open</button><button class="btn btn-remove" style="margin-bottom:0;" onclick="deleteSavedProject('${proj.id}')">Delete</button></div>`;
             container.appendChild(card);
         });
     }
 
     function openSavedProject(id) {
         const project = savedProjects.find(p => p.id === id);
-        if (project) {
-            currentProjectId = project.id; 
-            loadProjectToScreen(project);
-            closeModal('projectsModal');
-            setTimeout(() => { 
-                historyStack = []; 
-                redoStack = []; 
-                saveState(); 
-            }, 100);
-        }
+        if (project) { currentProjectId = project.id; hasUnsavedChanges = false; loadProjectToScreen(project); closeModal('projectsModal'); setTimeout(() => { historyStack = []; redoStack = []; saveState(); }, 100); }
     }
 
     function deleteSavedProject(id) {
-        if(confirm("Are you sure you want to delete this saved project?")) {
-            savedProjects = savedProjects.filter(p => p.id !== id);
-            localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects));
-            if(currentProjectId === id) currentProjectId = null;
-            openProjectsManager(); 
-        }
+        if(confirm("Are you sure you want to delete this saved project?")) { savedProjects = savedProjects.filter(p => p.id !== id); localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects)); if(currentProjectId === id) currentProjectId = null; openProjectsManager(); }
     }
 
     function loadProjectToScreen(data) {
         isRestoring = true; 
-        document.getElementById('projectName').value = data.p || '';
-        document.getElementById('location').value = data.l || '';
-        document.getElementById('projectDate').value = data.d || '';
+        document.getElementById('projectName').value = data.p || ''; document.getElementById('location').value = data.l || ''; document.getElementById('projectDate').value = data.d || '';
+        document.getElementById('layoutLinkInput').value = data.layout || ''; updateLayoutLinkUI();
         
-        // Restore Layout Link
-        document.getElementById('layoutLinkInput').value = data.layout || '';
-        updateLayoutLinkUI();
+        const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
+        if (data.i) { currentImageData = data.i; previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; } else { currentImageData = null; previewContainer.style.display = 'none'; preview.innerHTML = ''; }
         
-        const previewContainer = document.getElementById('imagePreviewContainer');
-        const preview = document.getElementById('imagePreview');
-        
-        if (data.i) {
-            currentImageData = data.i;
-            previewContainer.style.display = 'flex'; 
-            preview.innerHTML = `<img src="${currentImageData}" alt="Project Image">`;
-        } else { 
-            currentImageData = null; 
-            previewContainer.style.display = 'none'; 
-            preview.innerHTML = ''; 
-        }
-        
-        const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0];
-        table.innerHTML = '';
+        const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0]; table.innerHTML = '';
         
         if(data.rows && data.rows.length > 0) {
             data.rows.forEach(r => {
                 if (r.type === 'section') addSection(r.title, r.img, r.mult || 1);
-                else if (r.type === 'item') addRow(r.desc, r.qty, r.uom, r.price, r.hasCut, r.cutTime, r.cutMachine);
+                else if (r.type === 'item') addRow(r.desc, r.qty, r.uom, r.price, r.hasCut, r.cutTime, r.cutMachine, null, r.thumb);
             });
-            setTimeout(() => { 
-                document.querySelectorAll('.desc, .section-input').forEach(ta => autoResize(ta)); 
-                isRestoring = false; 
-            }, 50);
-        } else { 
-            addSection("WOOD BODY", null, 1); 
-            addRow(); 
-            setTimeout(() => { isRestoring = false; }, 50);
-        }
+            setTimeout(() => { document.querySelectorAll('.desc, .section-input').forEach(ta => autoResize(ta)); isRestoring = false; }, 50);
+        } else { addSection("WOOD BODY", null, 1); addRow(); setTimeout(() => { isRestoring = false; }, 50); }
         calculate();
     }
 
-    // =========================================================================
-    // V4.7 CleanURI Priority Test
-    // =========================================================================
     function openShareCenter(makeViewOnly = false) {
-        const exportData = extractCurrentProjectData(true); 
-        delete exportData.id; 
-        
-        const originalData = extractCurrentProjectData(false);
+        const exportData = extractCurrentProjectData(true); delete exportData.id; const originalData = extractCurrentProjectData(false);
         const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
-        
-        // Native Compression to Long URL
         const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-        const baseUrl = window.location.href.split('?')[0].split('#')[0]; 
-        const viewParam = makeViewOnly ? "&view=1" : "";
+        const baseUrl = window.location.href.split('?')[0].split('#')[0]; const viewParam = makeViewOnly ? "&view=1" : "";
         cachedLongShareLink = `${baseUrl}?data=${compressedData}${viewParam}`;
 
-        // Reset UI
-        document.getElementById('longShareLinkBox').value = cachedLongShareLink;
-        document.getElementById('shortenWaterfallStatus').innerHTML = "";
-        document.getElementById('autoShortenBtn').style.display = "inline-flex";
-        document.getElementById('autoShortenBtn').disabled = false;
-        
+        document.getElementById('longShareLinkBox').value = cachedLongShareLink; document.getElementById('shortenWaterfallStatus').innerHTML = ""; document.getElementById('autoShortenBtn').style.display = "inline-flex"; document.getElementById('autoShortenBtn').disabled = false;
         document.getElementById('shareCenterModal').style.display = 'flex';
-        
-        if (hasExcludedImages) {
-            alert("Notice: A large pasted image was safely excluded from the link so it wouldn't crash the URL limit. (Cloud uploaded images are fine).");
-        }
+        if (hasExcludedImages) alert("Notice: A large pasted image was safely excluded from the link so it wouldn't crash the URL limit.");
     }
 
     async function copyBoxToClipboard(elementId, btnEl) {
         const text = document.getElementById(elementId).value;
-        try {
-            await navigator.clipboard.writeText(text);
-            const originalText = btnEl.innerHTML;
-            btnEl.innerHTML = "✅ Copied!";
-            btnEl.style.backgroundColor = "var(--ios-green)";
-            btnEl.style.color = "white";
-            setTimeout(() => {
-                btnEl.innerHTML = originalText;
-                btnEl.style.backgroundColor = "";
-                btnEl.style.color = "";
-            }, 2000);
-        } catch (err) {
-            alert("Failed to copy. Please select the text manually.");
-        }
+        try { await navigator.clipboard.writeText(text); const originalText = btnEl.innerHTML; btnEl.innerHTML = "✅ Copied!"; btnEl.style.backgroundColor = "var(--ios-green)"; btnEl.style.color = "white"; setTimeout(() => { btnEl.innerHTML = originalText; btnEl.style.backgroundColor = ""; btnEl.style.color = ""; }, 2000); } catch (err) { alert("Failed to copy."); }
     }
 
+    // Direct TinyURL integration via proxy
     async function runShortenerWaterfall() {
-        const btn = document.getElementById('autoShortenBtn');
-        const statusBox = document.getElementById('shortenWaterfallStatus');
-        
-        btn.disabled = true;
+        const btn = document.getElementById('autoShortenBtn'); 
+        const statusBox = document.getElementById('shortenWaterfallStatus'); 
+        btn.disabled = true; 
         statusBox.style.color = "var(--text-main)";
 
-        if (cachedLongShareLink.length > 5000) {
-            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this immediately.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`;
-            btn.style.display = "none";
-            return;
+        if (cachedLongShareLink.length > 5000) { 
+            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`; 
+            btn.style.display = "none"; 
+            return; 
         }
 
-        // Waterfall Attempt 1: CleanURI (Moved to front based on request)
-        try {
-            statusBox.innerHTML = "⏳ Attempting Server 1 (CleanURI API)...";
-            const res = await fetch('https://corsproxy.io/?https://cleanuri.com/api/v1/shorten', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `url=${encodeURIComponent(cachedLongShareLink)}`
-            });
-            const data = await res.json();
-            if (data.result_url) {
-                applyShortLink(data.result_url, "✅ Success via CleanURI!");
-                return;
-            }
-        } catch (e) { console.warn("CleanURI failed:", e); }
-
-        // Waterfall Attempt 2: TinyURL
-        try {
-            statusBox.innerHTML = "⏳ CleanURI failed. Attempting Server 2 (TinyURL)...";
-            const res = await fetch(`https://corsproxy.io/?${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(cachedLongShareLink))}`);
-            if (res.ok) {
-                const text = await res.text();
-                if (text && text.includes('tinyurl.com')) {
-                    applyShortLink(text, "✅ Success via TinyURL!<br><span style='color:var(--text-muted); font-size:11px; font-weight:normal;'>Note: TinyURL may show a 10-second 'Preview' page to the person clicking it, but it will safely bypass your network's Antivirus block.</span>");
-                    return;
-                }
-            }
-        } catch (e) { console.warn("Waterfall 2 failed:", e); }
-
-        // Waterfall Attempt 3: Spoo.me (Direct POST)
-        try {
-            statusBox.innerHTML = "⏳ Attempting Server 3 (Spoo.me)...";
-            let bodyData = new URLSearchParams();
-            bodyData.append('url', cachedLongShareLink);
-            const res = await fetch('https://spoo.me/', { method: 'POST', body: bodyData });
-            const data = await res.json();
-            if (data.short_url) {
-                applyShortLink(data.short_url, "✅ Success via Spoo.me!");
-                return;
-            }
-        } catch (e) { console.warn("Waterfall 3 failed:", e); }
-
-        // All Attempts Failed
-        statusBox.innerHTML = `
-            ❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENERS</b><br><br>
-            Your browser (or corporate network) is strictly blocking background API requests. We cannot automatically shorten the link.<br><br>
-            <span style="color:var(--ios-blue);">Please click "Copy Direct Link" above, it will work perfectly offline!</span>
-        `;
-        btn.style.display = "none";
+        try { 
+            statusBox.innerHTML = "⏳ Attempting to shorten via TinyURL..."; 
+            const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cachedLongShareLink)}`;
+            
+            const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`); 
+            
+            if (res.ok) { 
+                const text = await res.text(); 
+                if (text && text.includes('tinyurl.com')) { 
+                    applyShortLink(text, "✅ Success via TinyURL!"); 
+                    return; 
+                } 
+            } 
+            throw new Error("TinyURL response invalid");
+        } catch (e) {
+            statusBox.innerHTML = `❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENER</b><br><br>Your browser or network blocked the API. Please click "Copy Direct Link" above.`; 
+            btn.style.display = "none";
+        }
     }
+    
+    function applyShortLink(url, successMsg) { document.getElementById('longShareLinkBox').value = url; document.getElementById('autoShortenBtn').style.display = "none"; document.getElementById('shortenWaterfallStatus').innerHTML = successMsg + "<br><br><span style='color:var(--ios-purple);'>The textbox above has been updated. Click Copy.</span>"; }
 
-    function applyShortLink(url, successMsg) {
-        document.getElementById('longShareLinkBox').value = url;
-        document.getElementById('autoShortenBtn').style.display = "none";
-        document.getElementById('shortenWaterfallStatus').innerHTML = successMsg + "<br><br><span style='color:var(--ios-purple);'>The textbox above has been updated. Click Copy.</span>";
-    }
+    // =========================================================================
+    // V5.6 TREE LIBRARY ENGINE 
+    // =========================================================================
+    let dragSrcData = null; 
 
     function saveStorage() { localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials)); }
+    function openLibraryManager() { document.getElementById('librarySearchInput').value = ''; document.getElementById('libraryModal').style.display = 'flex'; renderLibraryTree(); }
+    function createTreeGroup() { if(!Array.isArray(savedMaterials)) savedMaterials = []; savedMaterials.push({ id: generateId(), type: 'group', name: 'New Folder', isOpen: true, items: [] }); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
+    function createTreeItem() { if(!Array.isArray(savedMaterials) || savedMaterials.length === 0) createTreeGroup(); let newItem = { id: generateId(), name: "New Blank Material", price: 0, img: "" }; savedMaterials[savedMaterials.length - 1].items.push(newItem); savedMaterials[savedMaterials.length - 1].isOpen = true; saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
+
+    function renderLibraryTree(searchQuery = "") {
+        const container = document.getElementById('libraryManagerBody'); container.innerHTML = ''; const query = searchQuery.toLowerCase().trim(); const isSearching = query !== "";
+        if(!Array.isArray(savedMaterials) || savedMaterials.length === 0) { container.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted);">Library is empty. Click "New Group" to start.</div>`; return; }
+
+        savedMaterials.forEach((group, gIndex) => {
+            if (!group) return; let itemsToRender = Array.isArray(group.items) ? group.items : [];
+            if (isSearching) { let matchGroup = (group.name||"").toLowerCase().includes(query); itemsToRender = itemsToRender.filter(item => matchGroup || (item.name||"").toLowerCase().includes(query)); if (itemsToRender.length === 0 && !matchGroup) return; }
+
+            let groupWrap = document.createElement('div'); groupWrap.className = `tree-group-wrap ${group.isOpen || isSearching ? 'open' : ''}`;
+            let header = document.createElement('div'); header.className = 'tree-group-header';
+            
+            let dragHandleHtml = isSearching ? '' : `<span class="drag-handle" onmousedown="this.parentElement.draggable = true;" onmouseup="this.parentElement.draggable = false;" onmouseleave="this.parentElement.draggable = false;">⋮⋮</span>`;
+            
+            if(!isSearching) {
+                header.addEventListener('dragstart', (e) => handleDragStart(e, 'group', gIndex)); header.addEventListener('dragover', handleDragOver); header.addEventListener('dragleave', handleDragLeave); header.addEventListener('drop', (e) => handleDrop(e, 'group', gIndex)); header.addEventListener('dragend', handleDragEnd);
+            }
+
+            header.innerHTML = dragHandleHtml;
+
+            let toggleBtn = document.createElement('div'); toggleBtn.className = 'tree-toggle'; toggleBtn.innerText = (group.isOpen || isSearching) ? '-' : '+';
+            toggleBtn.onclick = (e) => { e.stopPropagation(); if(isSearching) return; group.isOpen = !group.isOpen; saveStorage(); renderLibraryTree(); };
+
+            let gInput = document.createElement('input'); gInput.type = 'text'; gInput.className = 'tree-input'; gInput.value = group.name || "Folder"; gInput.style.fontWeight = 'bold'; gInput.onchange = (e) => { group.name = e.target.value; saveStorage(); };
+
+            let actions = document.createElement('div'); actions.className = 'tree-actions'; actions.innerHTML = `<button class="t-btn del" title="Delete Folder" onclick="deleteTreeGroup(${gIndex})">✕</button>`;
+
+            header.appendChild(toggleBtn); header.appendChild(gInput); header.appendChild(actions); groupWrap.appendChild(header);
+
+            let itemList = document.createElement('ul'); itemList.className = 'tree-item-list';
+            itemsToRender.forEach((item, iIndex) => {
+                let li = document.createElement('li'); li.className = 'tree-item';
+                if(!isSearching) { li.addEventListener('dragstart', (e) => handleDragStart(e, 'item', gIndex, iIndex)); li.addEventListener('dragover', handleDragOver); li.addEventListener('dragleave', handleDragLeave); li.addEventListener('drop', (e) => handleDrop(e, 'item', gIndex, iIndex)); li.addEventListener('dragend', handleDragEnd); }
+
+                let thumbHtml = item.img ? `<img src="${item.img}">` : `<span>🖼️</span>`;
+                let itemDragHandle = isSearching ? '' : `<span class="drag-handle" onmousedown="this.parentElement.draggable = true;" onmouseup="this.parentElement.draggable = false;" onmouseleave="this.parentElement.draggable = false;">⋮⋮</span>`;
+
+                li.innerHTML = `
+                    ${itemDragHandle}
+                    <span class="tree-line">├─</span>
+                    <label class="tree-thumb" title="Upload thumbnail">
+                        ${thumbHtml}
+                        <input type="file" accept="image/*" style="display:none;" onchange="uploadTreeThumb(${gIndex}, ${iIndex}, this)">
+                    </label>
+                    <input type="text" class="tree-input" style="flex: 2;" value="${item.name||""}" placeholder="Material Name" onchange="updateTreeItem(${gIndex}, ${iIndex}, 'name', this.value)">
+                    <span style="color:var(--text-muted); font-size:12px;">₱</span>
+                    <input type="number" class="tree-input" style="flex: 1; max-width: 80px;" value="${item.price||0}" min="0" step="0.01" onchange="updateTreeItem(${gIndex}, ${iIndex}, 'price', this.value)">
+                    <div class="tree-actions"><button class="t-btn" title="Duplicate" onclick="duplicateTreeItem(${gIndex}, ${iIndex})">📄</button><button class="t-btn del" title="Remove" onclick="deleteTreeItem(${gIndex}, ${iIndex})">✕</button></div>
+                `;
+                itemList.appendChild(li);
+            });
+
+            if(itemsToRender.length === 0 && !isSearching) {
+                let emptyDrop = document.createElement('div'); emptyDrop.style.padding = "5px 20px"; emptyDrop.style.color = "var(--text-muted)"; emptyDrop.style.fontSize = "11px"; emptyDrop.innerText = "Drop items here...";
+                emptyDrop.addEventListener('dragover', handleDragOver); emptyDrop.addEventListener('dragleave', handleDragLeave); emptyDrop.addEventListener('drop', (e) => handleDrop(e, 'empty-group', gIndex)); itemList.appendChild(emptyDrop);
+            }
+            groupWrap.appendChild(itemList); container.appendChild(groupWrap);
+        });
+    }
+
+    function handleDragStart(e, type, gIndex, iIndex = null) {
+        dragSrcData = { type, gIndex, iIndex }; e.dataTransfer.effectAllowed = 'move';
+        if(e.target.tagName === 'INPUT') { e.preventDefault(); return; }
+        e.dataTransfer.setData('text/html', e.currentTarget.innerHTML); setTimeout(() => e.target.style.opacity = '0.4', 0);
+    }
+    function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); return false; }
+    function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+    function handleDrop(e, targetType, targetGIndex, targetIIndex = null) {
+        e.stopPropagation(); e.currentTarget.classList.remove('drag-over'); if (!dragSrcData) return false;
+        if (dragSrcData.type === 'group' && targetType === 'group') { let movedGroup = savedMaterials.splice(dragSrcData.gIndex, 1)[0]; savedMaterials.splice(targetGIndex, 0, movedGroup); } 
+        else if (dragSrcData.type === 'item') {
+            let sourceGroup = savedMaterials[dragSrcData.gIndex]; let movedItem = sourceGroup.items.splice(dragSrcData.iIndex, 1)[0];
+            if (targetType === 'group' || targetType === 'empty-group') { savedMaterials[targetGIndex].items.push(movedItem); savedMaterials[targetGIndex].isOpen = true; } else if (targetType === 'item') { savedMaterials[targetGIndex].items.splice(targetIIndex, 0, movedItem); }
+        }
+        dragSrcData = null; saveStorage(); renderLibraryTree(); return false;
+    }
+    function handleDragEnd(e) { e.target.style.opacity = '1'; document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
+    function updateTreeItem(gIndex, iIndex, field, value) { if(field === 'price') value = parseFloat(value) || 0; savedMaterials[gIndex].items[iIndex][field] = value; saveStorage(); }
+    function deleteTreeItem(gIndex, iIndex) { if(confirm("Delete this material?")) { savedMaterials[gIndex].items.splice(iIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
+    function duplicateTreeItem(gIndex, iIndex) { let original = savedMaterials[gIndex].items[iIndex]; savedMaterials[gIndex].items.splice(iIndex + 1, 0, { ...original, id: generateId(), name: original.name + " (Copy)" }); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
+    function deleteTreeGroup(gIndex) { if(confirm("Delete this entire folder and all its materials?")) { savedMaterials.splice(gIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
+    function uploadTreeThumb(gIndex, iIndex, inputEl) { if (!inputEl.files || !inputEl.files[0]) return; const labelBox = inputEl.closest('.tree-thumb'); uploadImage(inputEl.files[0], labelBox, (imgUrl) => { savedMaterials[gIndex].items[iIndex].img = imgUrl; saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }); }
+
+    // --- BULLETPROOF AUTOCOMPLETE ---
+    function filterLibrary(textarea) {
+        if (isViewOnlyMode) return; let val = textarea.value.toLowerCase(); let box = textarea.parentNode.querySelector('.suggestions-box'); if(box) box.innerHTML = '';
+        let allItems = []; if(Array.isArray(savedMaterials)) { savedMaterials.forEach(g => { if(g && Array.isArray(g.items)) { g.items.forEach(i => { allItems.push({...i, groupName: g.name || "Folder"}); }); } }); }
+        let matches = val ? allItems.filter(m => (m.name||"").toLowerCase().includes(val)) : allItems;
+        if (matches.length === 0) { if(box) box.style.display = 'none'; return; }
+        if(box) {
+            box.style.display = 'block';
+            matches.forEach(m => {
+                let div = document.createElement('div'); div.className = 'suggestion-item';
+                let thumbHtml = m.img ? `<img src="${m.img}" style="width:28px; height:28px; border-radius:4px; object-fit:cover;">` : `<div style="width:28px; height:28px; border-radius:4px; background:#e5e5ea; display:flex; align-items:center; justify-content:center; font-size:10px;">No Img</div>`;
+                div.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">${thumbHtml}<div style="flex-grow:1; line-height: 1.2;"><div style="font-weight:600; color:var(--text-main); font-size:13px;">${m.name}</div><div class="sugg-subtext" style="font-size:11px; color:var(--text-muted); font-weight:500;">📁 ${m.groupName} <span style="margin:0 5px;">|</span> ₱${parseFloat(m.price||0).toLocaleString('en-PH', {minimumFractionDigits: 2})}</div></div></div>`;
+                div.onmousedown = function(e) { e.preventDefault(); textarea.value = m.name; box.style.display = 'none'; autoResize(textarea); handleMaterialSelect(textarea, m); }; box.appendChild(div);
+            });
+        }
+    }
+
+    function handleMaterialSelect(textareaElement, matchedItem = null) {
+        if (isViewOnlyMode) return;
+        let row = textareaElement.closest('tr'); let priceInput = row.querySelector('.price'); let uomInput = row.querySelector('.uom');
+        
+        if (!matchedItem) {
+            let allItems = []; if(Array.isArray(savedMaterials)) { savedMaterials.forEach(g => { if(g && Array.isArray(g.items)) g.items.forEach(i => { allItems.push(i); }); }); }
+            matchedItem = allItems.find(m => (m.name||"").toLowerCase() === textareaElement.value.toLowerCase());
+        }
+        
+        if (matchedItem) { 
+            priceInput.value = '₱' + parseFloat(matchedItem.price||0).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if ((matchedItem.name||"").toLowerCase() === "printed sticker") uomInput.value = "sqin";
+            
+            // Push READ-ONLY Thumbnail to row
+            let thumbContainer = row.querySelector('.doc-thumb-box');
+            if(thumbContainer) {
+                if (matchedItem.img) {
+                    thumbContainer.innerHTML = `<img src="${matchedItem.img}" style="width:100%; height:100%; object-fit:cover;">`;
+                    thumbContainer.style.cursor = 'pointer';
+                    thumbContainer.onclick = function() { openLightbox(matchedItem.img); };
+                } else {
+                    thumbContainer.innerHTML = `<span style="font-size:16px; opacity: 0.3;">🚫</span>`;
+                    thumbContainer.style.cursor = 'default';
+                    thumbContainer.onclick = null;
+                }
+            }
+            calculate(); markUnsaved(); if(!isRestoring) saveState();
+        }
+    }
 
     function saveToLibrary() {
         if (isViewOnlyMode) return;
-        const rows = document.querySelectorAll("#materialsTable tbody tr");
-        let addedCount = 0;
+        const rows = document.querySelectorAll("#materialsTable tbody tr"); let addedCount = 0;
+        if(!Array.isArray(savedMaterials) || savedMaterials.length === 0) createTreeGroup();
         
         rows.forEach(row => {
             if (row.classList.contains('item-row')) {
                 let desc = row.querySelector(".desc").value.trim();
-                let priceRaw = row.querySelector(".price").value.replace(/[^0-9.]/g, "");
-                let price = parseFloat(priceRaw) || 0;
-                
+                let priceRaw = row.querySelector(".price").value.replace(/[^0-9.]/g, ""); let price = parseFloat(priceRaw) || 0;
+                let thumbImg = row.querySelector('.doc-thumb-box img'); let thumbSrc = thumbImg ? thumbImg.src : "";
+
                 if (desc) {
-                    let existingItemIndex = savedMaterials.findIndex(m => m.name.toLowerCase() === desc.toLowerCase());
-                    if (existingItemIndex !== -1) { 
-                        savedMaterials[existingItemIndex].price = price; 
-                    } else { 
-                        savedMaterials.push({ name: desc, price: price }); 
+                    let found = false;
+                    for(let g of savedMaterials) {
+                        if(g && Array.isArray(g.items)) {
+                            let item = g.items.find(i => (i.name||"").toLowerCase() === desc.toLowerCase());
+                            if(item) { item.price = price; if(thumbSrc && !thumbSrc.startsWith('data:')) item.img = thumbSrc; found = true; break; }
+                        }
+                    }
+                    if(!found) {
+                        if(!Array.isArray(savedMaterials) || savedMaterials.length === 0) { savedMaterials.push({ id: generateId(), type: 'group', name: 'New Folder', isOpen: true, items: [] }); }
+                        savedMaterials[savedMaterials.length - 1].items.push({ id: generateId(), name: desc, price: price, img: thumbSrc });
                     }
                     addedCount++;
                 }
@@ -1165,438 +1006,245 @@
 
         if (addedCount > 0) {
             saveStorage();
-            
-            const btn = document.getElementById('saveLibBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "✅ Saved!";
-            btn.style.backgroundColor = "var(--ios-green)"; 
-            btn.style.color = "white";
-            
-            setTimeout(() => { 
-                btn.innerHTML = originalText; 
-                btn.style.backgroundColor = ""; 
-                btn.style.color = ""; 
-            }, 2000);
-            
-        } else {
-            alert("Please enter a material description before saving.");
+            const btn = document.getElementById('saveLibBtn'); const originalText = btn.innerHTML;
+            btn.innerHTML = "✅ Saved!"; btn.style.backgroundColor = "var(--ios-green)"; btn.style.color = "white"; setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ""; btn.style.color = ""; }, 2000);
+        } else { alert("Please enter a material description before saving."); }
+    }
+
+    function exportLibraryBackup() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "Facade_Tree_Library.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    function importLibraryBackup(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { try { const importedData = JSON.parse(e.target.result); migrateAndSetLibrary(importedData); renderLibraryTree(); alert("Library restored successfully!"); } catch (error) { alert("Error reading backup file."); } }; reader.readAsText(file); } event.target.value = ''; }
+
+
+    // =========================================================================
+    // V5.6 DOCUMENT DRAG & DROP ENGINE 
+    // =========================================================================
+    let draggedDocRow = null; 
+    let draggedDocMode = null; 
+    let draggedRowsGroup = [];
+    let itemDragTopBound = null;
+    let itemDragBotBound = null;
+
+    function initDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = true; }
+    function endDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = false; }
+
+    function docDragStart(e) {
+        let tr = e.target.closest('tr'); draggedDocRow = tr;
+        if (tr.classList.contains('section-row')) {
+            draggedDocMode = 'section'; draggedRowsGroup = [tr];
+            let next = tr.nextElementSibling;
+            while (next && !next.classList.contains('section-row')) { draggedRowsGroup.push(next); next = next.nextElementSibling; }
+        } else if (tr.classList.contains('item-row')) { 
+            draggedDocMode = 'item'; draggedRowsGroup = [tr];
+            let cur = tr.previousElementSibling;
+            while(cur && !cur.classList.contains('section-labels-row')) cur = cur.previousElementSibling;
+            itemDragTopBound = cur;
+            cur = tr.nextElementSibling;
+            while(cur && !cur.classList.contains('section-summary-row') && !cur.classList.contains('section-row')) cur = cur.nextElementSibling;
+            itemDragBotBound = cur;
         }
     }
 
-    function autoResize(textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-    }
+    function docDragOver(e) {
+        let originalTarget = e.target.closest('tr'); if (!originalTarget) return;
+        const tbody = document.querySelector("#materialsTable tbody");
+        let targetTr = originalTarget;
 
-    function filterLibrary(textarea) {
-        if (isViewOnlyMode) return;
-        let val = textarea.value.toLowerCase();
-        let box = textarea.parentNode.querySelector('.suggestions-box');
-        box.innerHTML = '';
-        
-        let matches = savedMaterials;
-        if (val) { matches = savedMaterials.filter(m => m.name.toLowerCase().includes(val)); }
-        
-        if (matches.length === 0) { box.style.display = 'none'; return; }
-        box.style.display = 'block';
-        
-        matches.forEach(m => {
-            let div = document.createElement('div');
-            div.className = 'suggestion-item';
-            div.innerText = m.name;
-            div.onmousedown = function(e) { 
-                e.preventDefault(); 
-                textarea.value = m.name;
-                box.style.display = 'none';
-                autoResize(textarea);
-                handleMaterialSelect(textarea);
-            };
-            box.appendChild(div);
-        });
-    }
-
-    function handleMaterialSelect(textareaElement) {
-        if (isViewOnlyMode) return;
-        let row = textareaElement.closest('tr');
-        let priceInput = row.querySelector('.price');
-        let uomInput = row.querySelector('.uom');
-        let matchedItem = savedMaterials.find(m => m.name.toLowerCase() === textareaElement.value.toLowerCase());
-        
-        if (matchedItem) { 
-            priceInput.value = '₱' + parseFloat(matchedItem.price).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            if (matchedItem.name.toLowerCase() === "printed sticker") {
-                uomInput.value = "sqin";
+        if (draggedDocMode === 'item') {
+            let isValid = false;
+            let sibling = itemDragTopBound ? itemDragTopBound.nextElementSibling : null;
+            while(sibling && sibling !== itemDragBotBound && sibling !== null) {
+                if (sibling === targetTr) { isValid = true; break; }
+                sibling = sibling.nextElementSibling;
             }
-            calculate(); 
-            if(!isRestoring) saveState();
-        }
-    }
-
-    function exportLibraryBackup() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "library.json"); 
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click(); downloadAnchorNode.remove();
-    }
-
-    function importLibraryBackup(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (Array.isArray(importedData)) { savedMaterials = importedData; saveStorage(); renderLibraryManager(); alert("Library successfully restored!"); } 
-                    else { alert("Invalid backup file format."); }
-                } catch (error) { alert("Error reading backup file."); }
-            };
-            reader.readAsText(file);
-        }
-        event.target.value = ''; 
-    }
-
-    function openLibraryManager() { 
-        document.getElementById('librarySearchInput').value = ''; 
-        document.getElementById('libraryModal').style.display = 'flex'; 
-        renderLibraryManager(); 
-    }
-    
-    function renderLibraryManager(searchQuery = "") {
-        const tbody = document.getElementById('libraryManagerBody');
-        tbody.innerHTML = '';
-        
-        const query = searchQuery.toLowerCase().trim();
-        const isSearching = query !== "";
-
-        savedMaterials.forEach((item, index) => {
-            if (isSearching && !item.name.toLowerCase().includes(query)) return;
-
-            const tr = document.createElement('tr');
-            tr.className = 'drag-row';
+            if (targetTr === itemDragBotBound) isValid = true;
+            if (!isValid) return; 
+        } else if (draggedDocMode === 'section') {
+            let dropSectionHeader = originalTarget;
+            while(dropSectionHeader && !dropSectionHeader.classList.contains('section-row')) { dropSectionHeader = dropSectionHeader.previousElementSibling; }
+            if (!dropSectionHeader || draggedRowsGroup.includes(dropSectionHeader)) return;
             
-            if (!isSearching) {
-                tr.setAttribute('draggable', 'true');
-                tr.addEventListener('dragstart', handleDragStart);
-                tr.addEventListener('dragover', handleDragOver);
-                tr.addEventListener('dragenter', handleDragEnter);
-                tr.addEventListener('dragleave', handleDragLeave);
-                tr.addEventListener('drop', handleDrop);
-                tr.addEventListener('dragend', handleDragEnd);
+            let draggedIndex = Array.from(tbody.children).indexOf(draggedRowsGroup[0]);
+            let targetIndex = Array.from(tbody.children).indexOf(dropSectionHeader);
+            
+            if (draggedIndex < targetIndex) {
+                let next = dropSectionHeader.nextElementSibling;
+                while(next && !next.classList.contains('section-row')) { targetTr = next; next = next.nextElementSibling; }
+                targetTr = targetTr.nextElementSibling;
             } else {
-                tr.setAttribute('draggable', 'false');
+                targetTr = dropSectionHeader;
+            }
+            if(!targetTr) targetTr = tbody.lastElementChild;
+        }
+
+        e.preventDefault(); 
+        document.querySelectorAll('.doc-drag-over').forEach(el => el.classList.remove('doc-drag-over'));
+        targetTr.classList.add('doc-drag-over');
+    }
+
+    function docDrop(e) {
+        e.preventDefault(); document.querySelectorAll('.doc-drag-over').forEach(el => el.classList.remove('doc-drag-over'));
+        let originalTarget = e.target.closest('tr'); if (!originalTarget || !draggedDocRow) return;
+        const tbody = document.querySelector("#materialsTable tbody");
+
+        if (draggedDocMode === 'item') {
+            let targetTr = originalTarget;
+            let isValid = false; let sibling = itemDragTopBound ? itemDragTopBound.nextElementSibling : null;
+            while(sibling && sibling !== itemDragBotBound && sibling !== null) { if (sibling === targetTr) { isValid = true; break; } sibling = sibling.nextElementSibling; }
+            if (targetTr === itemDragBotBound) isValid = true;
+            if(isValid && targetTr !== draggedDocRow) { tbody.insertBefore(draggedDocRow, targetTr); }
+        } else if (draggedDocMode === 'section') {
+            let dropSectionHeader = originalTarget;
+            while(dropSectionHeader && !dropSectionHeader.classList.contains('section-row')) { dropSectionHeader = dropSectionHeader.previousElementSibling; }
+            if (!dropSectionHeader || draggedRowsGroup.includes(dropSectionHeader)) return;
+
+            let draggedIndex = Array.from(tbody.children).indexOf(draggedRowsGroup[0]);
+            let targetIndex = Array.from(tbody.children).indexOf(dropSectionHeader);
+            
+            let targetTr = dropSectionHeader;
+            if (draggedIndex < targetIndex) {
+                let next = dropSectionHeader.nextElementSibling;
+                while(next && !next.classList.contains('section-row')) { targetTr = next; next = next.nextElementSibling; }
+                targetTr = targetTr.nextElementSibling; 
             }
 
-            tr.setAttribute('data-index', index);
-            
-            const dragHandleHTML = !isSearching ? `<td class="drag-handle" title="Drag to reorder">⠿</td>` : `<td style="color:transparent; user-select:none;">⠿</td>`;
-
-            tr.innerHTML = `
-                ${dragHandleHTML}
-                <td><input type="text" class="item-input" value="${item.name}" onchange="updateManagedItem(${index}, 'name', this.value)"></td>
-                <td><input type="number" class="item-input" value="${item.price}" min="0" step="0.01" onchange="updateManagedItem(${index}, 'price', this.value)"></td>
-                <td><button class="btn btn-remove" onclick="removeManagedItem(${index})">Remove</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function handleDragStart(e) {
-        dragSrcEl = this;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', this.innerHTML);
-        setTimeout(() => this.classList.add('dragging'), 0);
-    }
-
-    function handleDragOver(e) {
-        if (e.preventDefault) { e.preventDefault(); }
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-    }
-
-    function handleDragEnter(e) { this.classList.add('drag-over'); }
-    function handleDragLeave(e) { this.classList.remove('drag-over'); }
-
-    function handleDrop(e) {
-        if (e.stopPropagation) { e.stopPropagation(); }
-        if (dragSrcEl !== this) {
-            const fromIndex = parseInt(dragSrcEl.getAttribute('data-index'));
-            const toIndex = parseInt(this.getAttribute('data-index'));
-            
-            const draggedItem = savedMaterials.splice(fromIndex, 1)[0];
-            savedMaterials.splice(toIndex, 0, draggedItem);
-            
-            saveStorage();
-            renderLibraryManager(); 
+            if (targetTr) { draggedRowsGroup.forEach(r => tbody.insertBefore(r, targetTr)); } 
+            else { draggedRowsGroup.forEach(r => tbody.appendChild(r)); }
         }
-        return false;
+        draggedDocRow = null; draggedRowsGroup = []; calculate(); markUnsaved(); if (!isRestoring) saveState();
     }
 
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        let rows = document.querySelectorAll('.drag-row');
-        [].forEach.call(rows, function (row) {
-            row.classList.remove('drag-over');
-        });
-    }
+    function docDragEnd(e) { document.querySelectorAll('.doc-drag-over').forEach(el => el.classList.remove('doc-drag-over')); draggedDocRow = null; draggedRowsGroup = []; }
 
-    function updateManagedItem(index, field, value) {
-        if (field === 'price') value = parseFloat(value) || 0;
-        savedMaterials[index][field] = value; saveStorage();
-    }
-    function removeManagedItem(index) {
-        if(confirm("Delete this material?")) { 
-            savedMaterials.splice(index, 1); 
-            saveStorage(); 
-            renderLibraryManager(document.getElementById('librarySearchInput').value); 
-        }
-    }
-    function addNewLibraryItem() { 
-        savedMaterials.push({ name: "", price: 0 }); 
-        saveStorage(); 
-        document.getElementById('librarySearchInput').value = ''; 
-        renderLibraryManager(); 
-    }
-
+    // --- ROW GENERATION ---
     function processImageDrop(file) {
         if (isViewOnlyMode) return;
         if (file && file.type.startsWith('image/')) {
             const label = document.querySelector('#mainImageDropZone label');
             uploadImage(file, label, (imgUrl) => {
-                currentImageData = imgUrl;
-                const previewContainer = document.getElementById('imagePreviewContainer');
-                const preview = document.getElementById('imagePreview');
-                previewContainer.style.display = 'flex'; 
-                preview.innerHTML = `<img src="${currentImageData}" alt="Project Image">`;
-                if(!isRestoring) saveState();
+                currentImageData = imgUrl; const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
+                previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; markUnsaved(); if(!isRestoring) saveState();
             });
         }
     }
     document.getElementById('projectImage').addEventListener('change', function(event) { processImageDrop(event.target.files[0]); });
     document.addEventListener('paste', function(event) {
-        if (isViewOnlyMode) return;
-        if(event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+        if (isViewOnlyMode) return; if(event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        for (let index in items) {
-            const item = items[index];
-            if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile());
-        }
+        for (let index in items) { const item = items[index]; if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile()); }
     });
-
     const dropZone = document.getElementById('mainImageDropZone');
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); if(!isViewOnlyMode) dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault(); dropZone.classList.remove('drag-over');
-        if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0]);
-    });
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0]); });
 
-    function addRowToSection(btn) {
-        const summaryRow = btn.closest('tr');
-        addRow("", "", "", "", false, "", "Laser", summaryRow);
-    }
+    function addRowToSection(btn) { const summaryRow = btn.closest('tr'); addRow("", "", "", "", false, "", "Laser", summaryRow); }
 
-    function addRow(desc = "", qty = "", uom = "", price = "", hasCut = false, cutTime = "", cutMachine = "Laser", targetRow = null) {
+    function addRow(desc = "", qty = "", uom = "", price = "", hasCut = false, cutTime = "", cutMachine = "Laser", targetRow = null, thumbUrl = null) {
         const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0];
-        const newRow = document.createElement("tr");
-        newRow.className = "item-row"; 
+        const newRow = document.createElement("tr"); newRow.className = "item-row"; 
+        newRow.ondragstart = docDragStart; newRow.ondragend = docDragEnd;
         
         let formattedPrice = (price !== "" && price !== null && parseFloat(price) > 0) ? '₱' + parseFloat(price).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '';
 
+        // V5.6 FIX: Removed input element for upload. Set div to act as a pure viewer.
         newRow.innerHTML = `
+            <td class="drag-td no-print" style="vertical-align: middle; text-align: center;"><span class="drag-handle" onmousedown="initDocDrag(this)" onmouseup="endDocDrag(this)" onmouseleave="endDocDrag(this)">⋮⋮</span></td>
             <td>
-                <div style="position: relative; width: 100%;">
-                    <textarea class="item-input desc no-print" rows="1" style="resize:none; overflow:hidden; width:100%; min-height: 42px; padding: 10px 12px; font-family: inherit; line-height: 1.4;" placeholder="Item description" oninput="autoResize(this); filterLibrary(this); handleMaterialSelect(this);" onfocus="filterLibrary(this)" onblur="setTimeout(()=>this.parentNode.querySelector('.suggestions-box').style.display='none', 200)">${desc}</textarea>
-                    <div class="print-only-desc print-only" style="display:none;"></div>
-                    <div class="suggestions-box no-print" style="display:none;"></div>
+                <div style="display: flex; gap: 8px;">
+                    <div class="doc-thumb-box no-print" style="width: 42px; height: 42px; border-radius: 6px; background: #e5e5ea; border: 1px dashed #c7c7cc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: ${thumbUrl ? 'pointer' : 'default'};" ${thumbUrl ? `onclick="openLightbox('${thumbUrl}')"` : ''}>
+                        ${thumbUrl ? `<img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:16px; opacity: 0.3;">🚫</span>`}
+                    </div>
+                    <div style="flex-grow: 1; position: relative;">
+                        <textarea class="item-input desc no-print" rows="1" style="resize:none; overflow:hidden; width:100%; min-height: 42px; padding: 10px 12px; font-family: inherit; line-height: 1.4;" placeholder="Item description" oninput="autoResize(this); filterLibrary(this); handleMaterialSelect(this);" onfocus="filterLibrary(this)" onblur="setTimeout(()=> { let b = this.parentNode.querySelector('.suggestions-box'); if(b) b.style.display='none'; }, 200)">${desc}</textarea>
+                        <div class="print-only-desc print-only" style="display:none;"></div>
+                        <div class="suggestions-box no-print" style="display:none;"></div>
+                    </div>
                 </div>
             </td>
             <td>
-                <div class="cut-inactive" style="display: ${hasCut ? 'none' : 'block'};">
-                    <button class="btn btn-manage no-print" style="margin:0; padding:6px 10px; font-size:12px; background: transparent; border: 1px dashed #c7c7cc;" onclick="toggleCut(this, true)">+ Add Cut</button>
-                    <span class="print-na">N/A</span>
-                </div>
-                <div class="cut-active" style="display: ${hasCut ? 'flex' : 'none'}; align-items: center; gap: 4px;">
-                    <input type="number" class="item-input cut-time" value="${cutTime}" min="0" placeholder="0" style="width: 55px; padding: 8px 10px;">
-                    <span style="font-size: 13px; color: var(--text-muted); font-weight: 500; margin-right: 2px;">mins</span>
-                    <select class="item-input cut-machine" style="width: 80px; padding: 8px 10px;">
-                        <option value="Laser" ${cutMachine === 'Laser' ? 'selected' : ''}>Laser</option>
-                        <option value="Router" ${cutMachine === 'Router' ? 'selected' : ''}>Router</option>
-                    </select>
-                    <span class="remove-cut-btn no-print" style="cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 0 4px;" onclick="toggleCut(this, false)">✕</span>
-                </div>
+                <div class="cut-inactive" style="display: ${hasCut ? 'none' : 'block'};"><button class="btn btn-manage no-print" style="margin:0; padding:6px 10px; font-size:12px; background: transparent; border: 1px dashed #c7c7cc;" onclick="toggleCut(this, true)">+ Add Cut</button><span class="print-na">N/A</span></div>
+                <div class="cut-active" style="display: ${hasCut ? 'flex' : 'none'}; align-items: center; gap: 4px;"><input type="number" class="item-input cut-time" value="${cutTime}" min="0" placeholder="0" style="width: 55px; padding: 8px 10px;"><span style="font-size: 13px; color: var(--text-muted); font-weight: 500; margin-right: 2px;">mins</span><select class="item-input cut-machine" style="width: 80px; padding: 8px 10px;"><option value="Laser" ${cutMachine === 'Laser' ? 'selected' : ''}>Laser</option><option value="Router" ${cutMachine === 'Router' ? 'selected' : ''}>Router</option></select><span class="remove-cut-btn no-print" style="cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 0 4px;" onclick="toggleCut(this, false)">✕</span></div>
             </td>
-            <td>
-                <div style="display: flex; gap: 4px;">
-                    <input type="text" class="item-input qty" value="${qty}" placeholder="0" oninput="calculate()" style="width: 60px; padding: 10px;">
-                    <input type="text" list="uomList" class="item-input uom" value="${uom}" placeholder="pcs" oninput="calculate()" style="width: 70px; padding: 10px;">
-                </div>
-            </td>
+            <td><div style="display: flex; gap: 4px;"><input type="text" class="item-input qty" value="${qty}" placeholder="0" oninput="calculate()" style="width: 60px; padding: 10px;"><input type="text" list="uomList" class="item-input uom" value="${uom}" placeholder="pcs" oninput="calculate()" style="width: 70px; padding: 10px;"></div></td>
             <td><input type="text" class="item-input price" value="${formattedPrice}" placeholder="₱0.00" onfocus="unformatPriceField(this)" onblur="formatPriceField(this)" oninput="calculate()"></td>
             <td class="line-total" style="font-weight: 500; color: #1d1d1f; padding-top: 18px;">₱0.00</td>
             <td class="no-print"><button class="btn btn-remove" onclick="removeRow(this)">✕</button></td>
         `;
         
-        if (targetRow && targetRow.parentNode) {
-            targetRow.parentNode.insertBefore(newRow, targetRow);
-        } else {
-            table.appendChild(newRow);
-        }
-
-        const ta = newRow.querySelector('.desc');
-        setTimeout(() => autoResize(ta), 10);
-        calculate();
-        if(!isRestoring) saveState();
+        if (targetRow && targetRow.parentNode) { targetRow.parentNode.insertBefore(newRow, targetRow); } else { table.appendChild(newRow); }
+        const ta = newRow.querySelector('.desc'); setTimeout(() => autoResize(ta), 10);
+        calculate(); if(!isRestoring) { markUnsaved(); saveState(); }
     }
 
     function toggleCut(element, show) {
-        const td = element.closest('td');
-        const inactiveDiv = td.querySelector('.cut-inactive');
-        const activeDiv = td.querySelector('.cut-active');
-        
-        if (show) {
-            inactiveDiv.style.display = 'none';
-            activeDiv.style.display = 'flex';
-        } else {
-            td.querySelector('.cut-time').value = '';
-            td.querySelector('.cut-machine').value = 'Laser';
-            activeDiv.style.display = 'none';
-            inactiveDiv.style.display = 'block';
-        }
-        if(!isRestoring) saveState();
+        const td = element.closest('td'); const inactiveDiv = td.querySelector('.cut-inactive'); const activeDiv = td.querySelector('.cut-active');
+        if (show) { inactiveDiv.style.display = 'none'; activeDiv.style.display = 'flex'; } else { td.querySelector('.cut-time').value = ''; td.querySelector('.cut-machine').value = 'Laser'; activeDiv.style.display = 'none'; inactiveDiv.style.display = 'block'; }
+        if(!isRestoring) { markUnsaved(); saveState(); }
     }
 
     function addSection(title = "", imgSrc = null, mult = 1) {
         const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0];
-        const newRow = table.insertRow();
-        newRow.className = "section-row"; 
+        const newRow = table.insertRow(); newRow.className = "section-row"; 
+        newRow.ondragstart = docDragStart; newRow.ondragend = docDragEnd;
         
         newRow.innerHTML = `
+            <td class="drag-td no-print" style="vertical-align: bottom; text-align: center; padding-bottom: 20px;"><span class="drag-handle" style="font-size: 16px;" onmousedown="initDocDrag(this)" onmouseup="endDocDrag(this)" onmouseleave="endDocDrag(this)">⋮⋮</span></td>
             <td colspan="5">
                 <div style="display:flex; justify-content:space-between; align-items:flex-end; width: 100%;">
-                    
                     <div style="display:flex; align-items:flex-end; flex: 1; gap: 15px; margin-right: 15px;">
                         <textarea class="section-input" rows="1" placeholder="Section Title (e.g. WOOD BODY)" oninput="autoResize(this);" style="flex: 1;">${title}</textarea>
-                        
-                        <div class="mult-container">
-                            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-right: 8px; letter-spacing: 0.5px;">QTY:</span>
-                            <input type="number" class="section-multiplier" value="${mult}" min="1" step="1" oninput="calculate();" style="width: 50px; padding: 4px 8px; border: none; border-radius: 6px; font-weight: 800; font-size: 14px; text-align: center; color: var(--ios-blue); background: #fff;">
-                        </div>
+                        <div class="mult-container"><span style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-right: 8px; letter-spacing: 0.5px;">QTY:</span><input type="number" class="section-multiplier" value="${mult}" min="1" step="1" oninput="calculate();" style="width: 50px; padding: 4px 8px; border: none; border-radius: 6px; font-weight: 800; font-size: 14px; text-align: center; color: var(--ios-blue); background: #fff;"></div>
                     </div>
-
                     <div class="section-img-wrapper">
                         <div style="display:flex; align-items:center; gap: 10px;">
-                            <label class="no-print" style="cursor:pointer; margin:0; background:#e5e5ea; color:#1d1d1f; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;">
-                                <span class="img-label-text">${imgSrc ? '🔄 Change Image' : '🖼️ Add Image'}</span>
-                                <input type="file" accept="image/*" style="display:none;" onchange="handleSectionImage(this)">
-                            </label>
-                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                            <label class="no-print" style="cursor:pointer; margin:0; background:#e5e5ea; color:#1d1d1f; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;"><span class="img-label-text">${imgSrc ? '🔄 Change Image' : '🖼️ Add Image'}</span><input type="file" accept="image/*" style="display:none;" onchange="handleSectionImage(this)"></label>
+                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer;" onclick="openLightbox(this.src)">
                         </div>
                     </div>
-
                 </div>
             </td>
             <td class="no-print" style="vertical-align: bottom; padding-bottom: 10px;"><button class="btn btn-remove" onclick="removeSection(this)">✕</button></td>
         `;
 
-        const labelsRow = table.insertRow();
-        labelsRow.className = "section-labels-row";
-        labelsRow.innerHTML = `
-            <th>Material Description</th>
-            <th>Machine Cut Info</th>
-            <th>Qty & Unit</th>
-            <th>Unit Price (₱)</th>
-            <th>Total (₱)</th>
-            <th class="no-print"></th>
-        `;
+        const labelsRow = table.insertRow(); labelsRow.className = "section-labels-row";
+        labelsRow.innerHTML = `<th class="no-print"></th><th>Material Description</th><th>Machine Cut Info</th><th>Qty & Unit</th><th>Unit Price (₱)</th><th>Total (₱)</th><th class="no-print"></th>`;
 
         const wrapper = newRow.querySelector('.section-img-wrapper');
         wrapper.addEventListener('dragover', (e) => { e.preventDefault(); if(!isViewOnlyMode) { wrapper.style.backgroundColor = 'rgba(0, 122, 255, 0.05)'; wrapper.style.borderColor = 'var(--ios-blue)'; } });
         wrapper.addEventListener('dragleave', (e) => { e.preventDefault(); if(!isViewOnlyMode) { wrapper.style.backgroundColor = ''; wrapper.style.borderColor = 'transparent'; } });
-        wrapper.addEventListener('drop', (e) => {
-            e.preventDefault(); if(!isViewOnlyMode) { wrapper.style.backgroundColor = ''; wrapper.style.borderColor = 'transparent'; }
-            if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) {
-                const input = wrapper.querySelector('input[type="file"]');
-                input.files = e.dataTransfer.files;
-                handleSectionImage(input);
-            }
-        });
-        
-        const taSection = newRow.querySelector('.section-input');
-        setTimeout(() => autoResize(taSection), 10);
-
-        if(!isRestoring) saveState();
+        wrapper.addEventListener('drop', (e) => { e.preventDefault(); if(!isViewOnlyMode) { wrapper.style.backgroundColor = ''; wrapper.style.borderColor = 'transparent'; } if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) { const input = wrapper.querySelector('input[type="file"]'); input.files = e.dataTransfer.files; handleSectionImage(input); } });
+        const taSection = newRow.querySelector('.section-input'); setTimeout(() => autoResize(taSection), 10); if(!isRestoring) { markUnsaved(); saveState(); }
     }
 
     function handleSectionImage(input) {
         if (isViewOnlyMode) return;
         if (input.files && input.files[0]) {
-            const wrapper = input.closest('.section-img-wrapper');
-            const labelEl = input.closest('label').querySelector('.img-label-text');
-
-            uploadImage(input.files[0], labelEl, (imgUrl) => {
-                const img = wrapper.querySelector('.sec-img-preview');
-                img.src = imgUrl; 
-                img.style.display = 'block';
-                labelEl.innerText = '🔄 Change Image';
-                if(!isRestoring) saveState();
-            });
+            const wrapper = input.closest('.section-img-wrapper'); const labelEl = input.closest('label').querySelector('.img-label-text');
+            uploadImage(input.files[0], labelEl, (imgUrl) => { const img = wrapper.querySelector('.sec-img-preview'); img.src = imgUrl; img.style.display = 'block'; labelEl.innerText = '🔄 Change Image'; markUnsaved(); if(!isRestoring) saveState(); });
         }
     }
 
-    function removeRow(button) {
-        const row = button.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-        calculate();
-        if(!isRestoring) saveState();
-    }
-    
-    function removeSection(button) {
-        const row = button.closest('tr');
-        const nextRow = row.nextElementSibling;
-        if (nextRow && nextRow.classList.contains('section-labels-row')) {
-            nextRow.remove(); 
-        }
-        row.remove();
-        calculate();
-        if(!isRestoring) saveState();
-    }
+    function removeRow(button) { const row = button.parentNode.parentNode; row.parentNode.removeChild(row); calculate(); markUnsaved(); if(!isRestoring) saveState(); }
+    function removeSection(button) { const row = button.closest('tr'); const nextRow = row.nextElementSibling; if (nextRow && nextRow.classList.contains('section-labels-row')) { nextRow.remove(); } row.remove(); calculate(); markUnsaved(); if(!isRestoring) saveState(); }
 
     function calculate() {
         const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0];
-        
         document.querySelectorAll('.section-summary-row').forEach(el => el.remove());
-        
         const rows = Array.from(table.getElementsByTagName("tr"));
-        
-        let grandSubtotal = 0;
-        let currentSectionSum = 0;
-        let currentMult = 1;
-        let currentSectionName = "";
-        let lastProcessedRow = null;
+        let grandSubtotal = 0; let currentSectionSum = 0; let currentMult = 1; let currentSectionName = ""; let lastProcessedRow = null;
 
         function insertSummary(afterEl) {
-            let tr = document.createElement('tr');
-            tr.className = "section-summary-row";
-            let sectionTotal = currentSectionSum * currentMult;
-            grandSubtotal += sectionTotal;
-
+            let tr = document.createElement('tr'); tr.className = "section-summary-row";
+            let sectionTotal = currentSectionSum * currentMult; grandSubtotal += sectionTotal;
             let multHtml = currentMult > 1 ? `<span style="color: var(--ios-blue); font-weight: 500; font-size: 11px; display: block; margin-top: 4px;">MULTIPLIER APPLIED (${currentMult} UNITS NEEDED). BASE SUM ₱${currentSectionSum.toLocaleString('en-PH', {minimumFractionDigits: 2})} × ${currentMult} = ₱${sectionTotal.toLocaleString('en-PH', {minimumFractionDigits: 2})}</span>` : '';
-
             tr.innerHTML = `
-                <td colspan="4" style="text-align: right; padding: 12px 15px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+                <td colspan="5" style="text-align: right; padding: 12px 15px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
                     <div style="position: relative; width: 100%; min-height: 24px;">
                         <button class="btn btn-manage no-print add-material-btn" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); padding: 6px 12px; margin: 0; font-size: 12px; border: 1px dashed #c7c7cc; background: transparent; color: var(--text-muted);" onclick="addRowToSection(this)">+ Add Material Here</button>
-                        <div class="summary-text-content" style="text-align: right; width: 100%; display: block;">
-                            <span style="font-weight: 700; color: var(--text-main); font-size: 13px;">${currentSectionName || 'SECTION'} SUBTOTAL</span>
-                            ${multHtml}
-                        </div>
+                        <div class="summary-text-content" style="text-align: right; width: 100%; display: block;"><span style="font-weight: 700; color: var(--text-main); font-size: 13px;">${currentSectionName || 'SECTION'} SUBTOTAL</span>${multHtml}</div>
                     </div>
                 </td>
-                <td class="line-total" style="font-weight: 800; color: var(--ios-blue); padding: 12px 8px; font-size: 15px; vertical-align: middle;">
-                    ₱${sectionTotal.toLocaleString('en-PH', {minimumFractionDigits: 2})}
-                </td>
+                <td class="line-total" style="font-weight: 800; color: var(--ios-blue); padding: 12px 8px; font-size: 15px; vertical-align: middle;">₱${sectionTotal.toLocaleString('en-PH', {minimumFractionDigits: 2})}</td>
                 <td class="no-print"></td>
             `;
             afterEl.after(tr);
@@ -1604,128 +1252,57 @@
 
         for (let i = 0; i < rows.length; i++) {
             let row = rows[i];
-
             if (row.classList.contains('section-row')) {
-                if (lastProcessedRow && i !== 0) {
-                    insertSummary(lastProcessedRow);
-                }
-                const multInput = row.querySelector('.section-multiplier');
-                currentMult = multInput ? (parseFloat(multInput.value) || 1) : 1;
-                const nameInput = row.querySelector('.section-input');
-                currentSectionName = nameInput ? nameInput.value : "SECTION";
-                currentSectionSum = 0;
-                lastProcessedRow = row;
-            }
-            else if (row.classList.contains('item-row')) {
-                const descTextarea = row.querySelector(".desc");
-                row.querySelector(".print-only-desc").innerText = descTextarea.value;
-
-                const qtyRaw = row.querySelector(".qty").value;
-                const uom = row.querySelector(".uom").value;
-                const qtyValue = parseQuantity(qtyRaw, uom);
-
-                const priceRaw = row.querySelector(".price").value.replace(/[^0-9.-]/g, "");
-                const price = parseFloat(priceRaw) || 0;
-                
+                if (lastProcessedRow && i !== 0) { insertSummary(lastProcessedRow); }
+                const multInput = row.querySelector('.section-multiplier'); currentMult = multInput ? (parseFloat(multInput.value) || 1) : 1;
+                const nameInput = row.querySelector('.section-input'); currentSectionName = nameInput ? nameInput.value : "SECTION"; currentSectionSum = 0; lastProcessedRow = row;
+            } else if (row.classList.contains('item-row')) {
+                const descTextarea = row.querySelector(".desc"); if (descTextarea) { let pDesc = row.querySelector(".print-only-desc"); if(pDesc) pDesc.innerText = descTextarea.value; }
+                let qtyInput = row.querySelector(".qty"); let uomInput = row.querySelector(".uom"); const qtyValue = parseQuantity(qtyInput ? qtyInput.value : "", uomInput ? uomInput.value : "");
+                let priceInput = row.querySelector(".price"); const priceRaw = priceInput ? priceInput.value.replace(/[^0-9.-]/g, "") : "0"; const price = parseFloat(priceRaw) || 0;
                 const lineTotal = qtyValue * price; 
-
-                row.querySelector(".line-total").innerHTML = `<span class="final-line-total">${formatCurrency(lineTotal)}</span>`;
-
-                currentSectionSum += lineTotal;
-                lastProcessedRow = row;
-            }
-            else if (row.classList.contains('section-labels-row')) {
-                lastProcessedRow = row;
-            }
+                let ltSpan = row.querySelector(".line-total"); if(ltSpan) ltSpan.innerHTML = `<span class="final-line-total">${formatCurrency(lineTotal)}</span>`;
+                currentSectionSum += lineTotal; lastProcessedRow = row;
+            } else if (row.classList.contains('section-labels-row')) { lastProcessedRow = row; }
         }
+        if (lastProcessedRow) { insertSummary(lastProcessedRow); }
 
-        if (lastProcessedRow) {
-            insertSummary(lastProcessedRow);
-        }
-
-        const vat = grandSubtotal * 0.12;
-        const grandTotal = grandSubtotal + vat;
-        document.getElementById("subtotal").innerText = formatCurrency(grandSubtotal);
-        document.getElementById("vat").innerText = formatCurrency(vat);
-        document.getElementById("grandTotal").innerText = formatCurrency(grandTotal);
+        const vat = grandSubtotal * 0.12; const grandTotal = grandSubtotal + vat;
+        let elSub = document.getElementById("subtotal"); if(elSub) elSub.innerText = formatCurrency(grandSubtotal);
+        let elVat = document.getElementById("vat"); if(elVat) elVat.innerText = formatCurrency(vat);
+        let elGt = document.getElementById("grandTotal"); if(elGt) elGt.innerText = formatCurrency(grandTotal);
     }
 
-    function formatCurrency(amount) {
-        return "₱" + amount.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    }
+    function autoResize(textarea) { if(!textarea) return; textarea.style.height = 'auto'; textarea.style.height = textarea.scrollHeight + 'px'; }
+    function formatCurrency(amount) { return "₱" + amount.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
 
     function exportToExcel() {
         if (typeof XLSX === 'undefined') { alert("Error: Excel library not loaded."); return; }
-
-        let projName = document.getElementById('projectName').value || "Unnamed Project";
-        let loc = document.getElementById('location').value || "No Location provided";
-        let projDate = document.getElementById('projectDate').value || "No Date";
-
-        let excelData = [
-            ["Project Name", projName, "", "Date", projDate], ["Location", loc]
-        ];
+        let projName = document.getElementById('projectName').value || "Unnamed Project"; let loc = document.getElementById('location').value || "No Location provided"; let projDate = document.getElementById('projectDate').value || "No Date";
+        let excelData = [ ["Project Name", projName, "", "Date", projDate], ["Location", loc] ];
 
         const rows = document.querySelectorAll("#materialsTable tbody tr");
         rows.forEach(row => {
             if (row.classList.contains('section-row')) {
-                let sectionName = row.querySelector(".section-input").value.trim() || "NEW SECTION";
-                let multInput = row.querySelector('.section-multiplier');
-                let mult = multInput ? (parseFloat(multInput.value) || 1) : 1;
-                let titleStr = mult > 1 ? `--- ${sectionName.toUpperCase()} (QTY: ${mult}) ---` : `--- ${sectionName.toUpperCase()} ---`;
-                
-                excelData.push([]); 
-                excelData.push([titleStr, "", "", "", "", "", ""]);
-                excelData.push(["Material Description", "Cut Mins", "Machine", "Qty", "Unit", "Unit Price (PHP)", "Line Total (PHP)"]);
+                let sectionName = row.querySelector(".section-input").value.trim() || "NEW SECTION"; let multInput = row.querySelector('.section-multiplier'); let mult = multInput ? (parseFloat(multInput.value) || 1) : 1; let titleStr = mult > 1 ? `--- ${sectionName.toUpperCase()} (QTY: ${mult}) ---` : `--- ${sectionName.toUpperCase()} ---`;
+                excelData.push([]); excelData.push([titleStr, "", "", "", "", "", ""]); excelData.push(["Material Description", "Cut Mins", "Machine", "Qty", "Unit", "Unit Price (PHP)", "Line Total (PHP)"]);
             } else if (row.classList.contains('item-row')) {
-                let desc = row.querySelector(".desc").value;
-                const isCutActive = row.querySelector('.cut-active').style.display === 'flex';
-                
-                let cutTimeRaw = row.querySelector('.cut-time').value;
-                let cutTime = isCutActive ? (cutTimeRaw ? cutTimeRaw + " mins" : "0 mins") : "N/A";
-                let cutMachine = isCutActive ? row.querySelector('.cut-machine').value : "N/A";
-                
-                let qtyRaw = row.querySelector(".qty").value; 
-                let uom = row.querySelector(".uom").value;
-                
-                let priceRaw = row.querySelector(".price").value.replace(/[^0-9.-]/g, "");
-                let price = parseFloat(priceRaw) || 0;
-                
-                let finalTotalEl = row.querySelector('.final-line-total');
-                let totalStr = finalTotalEl ? finalTotalEl.innerText : row.querySelector('.line-total').innerText;
-                let total = parseFloat(totalStr.replace(/₱|,/g, "").trim()) || 0;
-                
-                if(desc || qtyRaw) {
-                    excelData.push([desc, cutTime, cutMachine, qtyRaw, uom, price, total]);
-                }
+                let desc = row.querySelector(".desc").value; const isCutActive = row.querySelector('.cut-active').style.display === 'flex';
+                let cutTimeRaw = row.querySelector('.cut-time').value; let cutTime = isCutActive ? (cutTimeRaw ? cutTimeRaw + " mins" : "0 mins") : "N/A"; let cutMachine = isCutActive ? row.querySelector('.cut-machine').value : "N/A";
+                let qtyRaw = row.querySelector(".qty").value; let uom = row.querySelector(".uom").value;
+                let priceRaw = row.querySelector(".price").value.replace(/[^0-9.-]/g, ""); let price = parseFloat(priceRaw) || 0;
+                let finalTotalEl = row.querySelector('.final-line-total'); let totalStr = finalTotalEl ? finalTotalEl.innerText : row.querySelector('.line-total').innerText; let total = parseFloat(totalStr.replace(/₱|,/g, "").trim()) || 0;
+                if(desc || qtyRaw) { excelData.push([desc, cutTime, cutMachine, qtyRaw, uom, price, total]); }
             } else if (row.classList.contains('section-summary-row')) {
-                let finalTotalStr = row.querySelector('.line-total').innerText;
-                let finalTotal = parseFloat(finalTotalStr.replace(/₱|,/g, "").trim()) || 0;
-
-                let textDiv = row.querySelector('.summary-text-content');
-                let mainLabel = textDiv.querySelector('span:first-child').innerText;
-
+                let finalTotalStr = row.querySelector('.line-total').innerText; let finalTotal = parseFloat(finalTotalStr.replace(/₱|,/g, "").trim()) || 0;
+                let textDiv = row.querySelector('.summary-text-content'); let mainLabel = textDiv.querySelector('span:first-child').innerText;
                 excelData.push(["", "", "", "", "", mainLabel, finalTotal]);
-
-                let noteSpan = textDiv.querySelector('span:nth-child(2)');
-                if (noteSpan) {
-                     excelData.push(["", "", "", "", "", "Note:", noteSpan.innerText]);
-                }
+                let noteSpan = textDiv.querySelector('span:nth-child(2)'); if (noteSpan) { excelData.push(["", "", "", "", "", "Note:", noteSpan.innerText]); }
             }
         });
-
-        let subVal = parseFloat(document.getElementById('subtotal').innerText.replace(/₱|,/g, "").trim());
-        let vatVal = parseFloat(document.getElementById('vat').innerText.replace(/₱|,/g, "").trim());
-        let grandVal = parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim());
-
-        excelData.push([]); 
-        excelData.push(["", "", "", "", "", "Subtotal", subVal]);
-        excelData.push(["", "", "", "", "", "VAT (12%)", vatVal]);
-        excelData.push(["", "", "", "", "", "Grand Total", grandVal]);
-
-        let worksheet = XLSX.utils.aoa_to_sheet(excelData);
-        let workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Material Estimate");
-        XLSX.writeFile(workbook, "Material_Estimate.xlsx");
+        let subVal = parseFloat(document.getElementById('subtotal').innerText.replace(/₱|,/g, "").trim()); let vatVal = parseFloat(document.getElementById('vat').innerText.replace(/₱|,/g, "").trim()); let grandVal = parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim());
+        excelData.push([]); excelData.push(["", "", "", "", "", "Subtotal", subVal]); excelData.push(["", "", "", "", "", "VAT (12%)", vatVal]); excelData.push(["", "", "", "", "", "Grand Total", grandVal]);
+        let worksheet = XLSX.utils.aoa_to_sheet(excelData); let workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Material Estimate"); XLSX.writeFile(workbook, "Material_Estimate.xlsx");
     }
 
     function exportToPDF() { window.print(); }
