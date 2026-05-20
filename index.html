@@ -70,7 +70,6 @@
             margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
-        /* Standard Inputs */
         input[type="text"], input[type="file"], input[type="date"], input[type="number"], select, textarea {
             width: 100%; padding: 14px 16px; background-color: var(--input-bg);
             border: 1px solid transparent; border-radius: 12px; font-size: 14px;
@@ -157,12 +156,14 @@
         .btn:active { transform: scale(0.97); }
         .btn-primary { background-color: var(--ios-blue); color: white; }
         .btn-primary:hover { background-color: var(--ios-blue-hover); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-success { background-color: var(--ios-green); color: white; }
         .btn-success:hover { background-color: #2da94c; }
         .btn-section { background-color: var(--ios-gray); color: var(--ios-gray-text); }
         .btn-section:hover { background-color: #d1d1d6; }
         .btn-share { background-color: rgba(0, 122, 255, 0.1); color: var(--ios-blue); }
         .btn-share:hover { background-color: rgba(0, 122, 255, 0.2); }
+        .btn-share:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-library { background-color: rgba(88, 86, 214, 0.1); color: var(--ios-purple); }
         .btn-library:hover { background-color: rgba(88, 86, 214, 0.2); }
         .btn-manage { background-color: rgba(134, 134, 139, 0.1); color: #48484a; }
@@ -198,19 +199,12 @@
         .search-bar-wrapper input { padding-left: 40px; }
         .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
 
-        /* --- Drag Handle Styling --- */
-        .drag-handle { 
-            color: #c7c7cc; cursor: grab; user-select: none; font-weight: bold; 
-            letter-spacing: -2px; transition: color 0.2s; padding: 5px; 
-            display: inline-block; width: 14px; text-align: center;
-        }
+        .drag-handle { color: #c7c7cc; cursor: grab; user-select: none; font-weight: bold; letter-spacing: -2px; transition: color 0.2s; padding: 5px; display: inline-block; width: 14px; text-align: center; }
         .drag-handle:hover { color: var(--ios-blue); }
         .drag-handle:active { cursor: grabbing; color: var(--ios-blue); }
-        
-        /* Table row drag styling */
         .doc-drag-over td { border-top: 2px solid var(--ios-blue) !important; background: rgba(0, 122, 255, 0.02); }
 
-        /* --- V5.6 Tree View Architecture --- */
+        /* --- V7.0 Tree View Architecture --- */
         .tree-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; user-select: none; }
         .tree-group-wrap { margin-bottom: 4px; }
         .tree-group-header { display: flex; align-items: center; background: #f5f5f7; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; transition: background 0.1s; }
@@ -245,7 +239,6 @@
 
         /* Share Modal Specifics */
         .share-input-box { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; font-family: monospace; font-size: 12px; margin-bottom: 15px; color: var(--text-main); resize: none; overflow: hidden; }
-        .shortener-panel { background: #f9f9f9; padding: 20px; border-radius: 12px; border: 1px dashed var(--border-color); margin-top: 20px; text-align: center;}
 
         @media print {
             body { background-color: white; padding: 0; }
@@ -298,21 +291,21 @@
         <div>
             <span class="close-modal" onclick="closeModal('shareCenterModal')">&times;</span>
             <h2 style="margin-top: 0; font-weight: 700; letter-spacing: -0.5px;">Share Project</h2>
-            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">This unblockable link contains all your data encoded inside it. It works offline and bypasses all firewalls.</p>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Generate a tiny Cloud Link that contains your entire layout and images. This completely bypasses all adblockers.</p>
         </div>
         
-        <textarea id="longShareLinkBox" class="share-input-box" rows="4" readonly></textarea>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button class="btn btn-primary" onclick="copyBoxToClipboard('longShareLinkBox', this)" style="flex: 1;">📋 Copy Direct Link</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-primary" id="cloudShareBtn" onclick="generateCloudShareLink(false)" style="flex: 1; margin-bottom: 0;">☁️ Generate Editable Link</button>
+            <button class="btn btn-share" id="cloudShareViewBtn" onclick="generateCloudShareLink(true)" style="flex: 1; margin-bottom: 0;">👁️ Generate View-Only Link</button>
         </div>
 
-        <div class="shortener-panel">
-            <h4 style="margin: 0 0 10px 0; color: var(--text-main);">Want a shorter link?</h4>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">If your network blocks APIs, click the button below. Our server will attempt to bypass your firewall automatically.</p>
-            <button class="btn btn-manage" id="autoShortenBtn" onclick="runShortenerWaterfall()">🪄 Generate TinyURL</button>
-            <div id="shortenWaterfallStatus" style="font-size: 13px; font-weight: 600; margin-top: 15px; color: var(--ios-blue);"></div>
+        <textarea id="longShareLinkBox" class="share-input-box" rows="2" readonly placeholder="Click a button above to generate your link..."></textarea>
+        
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-manage" onclick="copyBoxToClipboard('longShareLinkBox', this)" style="flex: 1; margin-bottom: 0;">📋 Copy Link</button>
         </div>
+        
+        <div id="shortenWaterfallStatus" style="font-size: 13px; font-weight: 600; margin-top: 15px; color: var(--ios-blue); text-align: center;"></div>
     </div>
 </div>
 
@@ -362,7 +355,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v5.6 (Read-Only Row Thumbs & Lightbox)
+    Build v7.0 (Cloud JSON Storage / Image Fix)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -431,7 +424,14 @@
     <div id="tableContainer">
         <table id="materialsTable">
             <colgroup>
-                <col width="3%" class="no-print"> <col width="28%"> <col width="19%"> <col width="14%"> <col width="16%"> <col width="15%"> <col width="5%" class="no-print"> </colgroup>
+                <col width="3%" class="no-print">
+                <col width="28%">
+                <col width="19%">
+                <col width="14%">
+                <col width="16%">
+                <col width="15%">
+                <col width="5%" class="no-print">
+            </colgroup>
             <tbody>
                 </tbody>
         </table>
@@ -442,8 +442,7 @@
             <button class="btn btn-primary" onclick="addRow()">+ Material</button>
             <button class="btn btn-section" onclick="addSection()">+ Section</button>
             <span style="margin: 0 10px; color:var(--border-color);">|</span>
-            <button class="btn btn-share" onclick="openShareCenter(false)">🔗 Share Center</button>
-            <button class="btn btn-share" onclick="openShareCenter(true)" style="background-color: rgba(88, 86, 214, 0.1); color: var(--ios-purple);">👁️ Share (View Only)</button>
+            <button class="btn btn-share" onclick="openShareCenter()">🔗 Share Project</button>
         </div>
         <div style="margin-top:10px;">
             <button class="btn btn-library" onclick="saveToLibrary()" id="saveLibBtn">Save to Library</button>
@@ -462,11 +461,6 @@
 </div>
 
 <script>
-    // ==========================================
-    // IMGBB API KEY SECURED & ACTIVE
-    const IMGBB_API_KEY = "c2bdac3065be1e1346bdb440b2287d48"; 
-    // ==========================================
-
     // --- STATE VARIABLES ---
     let historyStack = [];
     let redoStack = [];
@@ -479,8 +473,6 @@
     let currentImageData = null; 
     let currentProjectId = null;
     
-    // AutoSave / Closing Warning Trackers
-    let cachedLongShareLink = "";
     let hasUnsavedChanges = false;
     let autoSaveTimer;
 
@@ -502,13 +494,13 @@
 
     function saveState() {
         if (isRestoring || isViewOnlyMode) return; 
-        const currentState = extractCurrentProjectData(false); 
+        const currentState = extractCurrentProjectData(); 
         if (historyStack.length > 0) {
             const lastState = historyStack[historyStack.length - 1];
             if (JSON.stringify(lastState) === JSON.stringify(currentState)) return;
         }
         historyStack.push(currentState);
-        if (historyStack.length > 50) historyStack.shift(); 
+        if (historyStack.length > 15) historyStack.shift(); 
         redoStack = []; 
     }
 
@@ -586,40 +578,63 @@
     // --- UNIVERSAL LIGHTBOX ENGINE ---
     function openLightbox(src) {
         if (!src) return;
-        document.getElementById('lightboxImage').src = src;
+        const img = document.getElementById('lightboxImage');
+        img.style.display = 'block';
+        img.src = src;
         document.getElementById('lightboxModal').style.display = 'flex';
     }
 
-    // --- HYBRID IMAGE ENGINE ---
-    function compressImage(file, callback) {
+    // --- PURE LOCAL COMPRESSION ENGINE ---
+    function processLocalImage(file, labelElement, isThumb, callback) {
+        if (!file) { alert("No file found."); return; }
+
+        let originalContent = labelElement ? labelElement.innerHTML : '';
+        if (labelElement) {
+            if (isThumb) labelElement.innerHTML = `<span style="font-size:10px;">⏳</span>`;
+            else labelElement.innerHTML = `<span class="img-label-text">⏳ Loading...</span>`;
+        }
+
         const reader = new FileReader();
+        reader.onerror = () => {
+            alert("Error reading file from your device.");
+            if (labelElement) labelElement.innerHTML = originalContent;
+        };
+
         reader.onload = function(e) {
             const img = new Image();
+            img.onerror = () => {
+                if (labelElement) labelElement.innerHTML = originalContent;
+                callback(e.target.result);
+            };
+
             img.onload = function() {
-                const canvas = document.createElement('canvas'); const MAX_WIDTH = 500; let width = img.width, height = img.height;
-                if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-                canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                callback(canvas.toDataURL('image/jpeg', 0.5));
+                try {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = isThumb ? 150 : 600;
+                    let width = img.width, height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', isThumb ? 0.4 : 0.6);
+                    
+                    if (labelElement) labelElement.innerHTML = originalContent;
+                    callback(dataUrl);
+                } catch(err) {
+                    if (labelElement) labelElement.innerHTML = originalContent;
+                    callback(e.target.result);
+                }
             }
             img.src = e.target.result;
         }
         reader.readAsDataURL(file);
-    }
-
-    function uploadImage(file, labelElement, callback) {
-        if (IMGBB_API_KEY && IMGBB_API_KEY.trim() !== "") {
-            let formData = new FormData(); formData.append("image", file);
-            let isThumbBox = labelElement.classList && labelElement.classList.contains('tree-thumb');
-            let originalContent = labelElement.innerHTML;
-            
-            if(isThumbBox) { labelElement.innerHTML = `<span style="font-size:10px;">⏳</span>`; } 
-            else { let iconSpan = labelElement.querySelector('span'); if(iconSpan) labelElement.innerHTML = `<span style="display:block;">⏳</span>Uploading...`; else labelElement.innerText = "⏳ Uploading..."; }
-
-            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData })
-            .then(res => res.json()).then(data => {
-                if(data.success) { callback(data.data.url); } else { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload failed."); }
-            }).catch(err => { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload error."); });
-        } else { compressImage(file, callback); }
     }
 
     function updateLayoutLinkUI() {
@@ -627,7 +642,7 @@
         if(link) { display.style.display = 'flex'; let finalLink = link; if(!finalLink.startsWith('http')) finalLink = 'https://' + finalLink; anchor.href = finalLink; } else { display.style.display = 'none'; }
     }
 
-    // --- V5.6 BULLETPROOF TREE DATA MIGRATION ---
+    // --- TREE DATA MIGRATION ---
     function generateId() { return Math.random().toString(36).substr(2, 9); }
 
     function loadDefaultTree() {
@@ -666,8 +681,36 @@
 
     window.onload = async function() {
         await loadLibrary(); loadProjects(); 
-        const currentUrl = new URL(window.location.href); let sharedData = currentUrl.searchParams.get('data') || currentUrl.searchParams.get('d'); let isViewOnly = currentUrl.searchParams.get('view') === '1';
-        if (sharedData) {
+        
+        const currentUrl = new URL(window.location.href); 
+        let isViewOnly = currentUrl.searchParams.get('view') === '1';
+        
+        // V7.0 Check for Cloud Bin ID first
+        const binId = currentUrl.searchParams.get('bin');
+        const sharedData = currentUrl.searchParams.get('data') || currentUrl.searchParams.get('d'); 
+        
+        if (binId) {
+            isViewOnlyMode = isViewOnly;
+            try {
+                // Fetch quietly via JSON so Brave doesn't freak out
+                const response = await fetch(`https://api.npoint.io/${binId}`);
+                if (response.ok) {
+                    const decodedData = await response.json();
+                    loadProjectToScreen(decodedData);
+                    if (!isViewOnlyMode) { 
+                        setTimeout(() => { saveState(); }, 100); 
+                        window.history.pushState({}, document.title, window.location.pathname); 
+                    } else { 
+                        lockUIForViewOnly(); 
+                    }
+                } else { throw new Error("Cloud file not found."); }
+            } catch (e) {
+                alert("⚠️ ERROR: Could not fetch cloud project. It may have been deleted.");
+                setupDefaultTable();
+            }
+        }
+        else if (sharedData) {
+            // Fallback for older offline links
             try {
                 isViewOnlyMode = isViewOnly; let decodedString = LZString.decompressFromEncodedURIComponent(sharedData);
                 if (!decodedString) decodedString = LZString.decompressFromBase64(sharedData.replace(/ /g, '+'));
@@ -675,9 +718,10 @@
                 const decodedData = JSON.parse(decodedString); loadProjectToScreen(decodedData);
                 if (!isViewOnlyMode) { setTimeout(() => { saveState(); }, 100); window.history.pushState({}, document.title, window.location.pathname); } else { lockUIForViewOnly(); }
             } catch (e) { alert("⚠️ ERROR LOADING DATA"); setupDefaultTable(); }
-        } else { setupDefaultTable(); }
+        } else { 
+            setupDefaultTable(); 
+        }
         
-        // Attach Document Drag Listeners securely
         const tbody = document.querySelector("#materialsTable tbody");
         tbody.addEventListener('dragover', docDragOver);
         tbody.addEventListener('drop', docDrop);
@@ -691,7 +735,6 @@
         });
         document.querySelectorAll('.mult-container').forEach(el => { el.style.background = 'transparent'; el.style.border = 'none'; });
         
-        // Hiding actionable buttons but keeping handles visible structurally
         const elementsToHide = document.querySelectorAll(`.header-actions button, .actions-bar div:first-child, #saveLibBtn, button[onclick="openLibraryManager()"], .btn-remove, .cut-inactive, .remove-cut-btn, #mainImageDropZone, #layoutInputLabel, #layoutLinkInput, label.no-print, .actions-bar span, .add-material-btn, .drag-handle`);
         
         elementsToHide.forEach(el => { if(el) el.style.display = 'none'; });
@@ -702,12 +745,11 @@
     function setupDefaultTable() { isRestoring = true; addSection("WOOD BODY", null, 1); addRow(); setTimeout(() => { isRestoring = false; saveState(); }, 50); }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; calculate(); }
 
-    function extractCurrentProjectData(sanitizeForUrl = false) {
-        const safeImage = (imgStr) => { if (!imgStr) return null; if (sanitizeForUrl && imgStr.startsWith('data:image')) return null; return imgStr; };
+    function extractCurrentProjectData() {
         const exportData = {
             id: currentProjectId || Date.now().toString(),
             p: document.getElementById('projectName').value || "", l: document.getElementById('location').value, d: document.getElementById('projectDate').value,
-            i: safeImage(currentImageData), layout: document.getElementById('layoutLinkInput').value.trim(), rows: [],
+            i: currentImageData, layout: document.getElementById('layoutLinkInput').value.trim(), rows: [],
             total: parseFloat(document.getElementById('grandTotal').innerText.replace(/₱|,/g, "").trim()) || 0
         };
         const rows = document.querySelectorAll("#materialsTable tbody tr");
@@ -715,7 +757,7 @@
             if (row.classList.contains('section-row')) {
                 const imgEl = row.querySelector('.sec-img-preview'); const imgSrc = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : null;
                 const multInput = row.querySelector('.section-multiplier'); const mult = multInput ? (parseFloat(multInput.value) || 1) : 1;
-                exportData.rows.push({ type: 'section', title: row.querySelector('.section-input').value, img: safeImage(imgSrc), mult: mult });
+                exportData.rows.push({ type: 'section', title: row.querySelector('.section-input').value, img: imgSrc, mult: mult });
             } else if (row.classList.contains('item-row')) {
                 const isCutActive = row.querySelector('.cut-active').style.display === 'flex';
                 const priceRaw = row.querySelector('.price').value.replace(/[^0-9.]/g, "");
@@ -723,7 +765,7 @@
                 exportData.rows.push({ 
                     type: 'item', desc: row.querySelector('.desc').value, hasCut: isCutActive, cutTime: isCutActive ? row.querySelector('.cut-time').value : "", 
                     cutMachine: isCutActive ? row.querySelector('.cut-machine').value : "Laser", qty: row.querySelector('.qty').value, uom: row.querySelector('.uom').value, 
-                    price: parseFloat(priceRaw) || 0, thumb: thumbImg ? safeImage(thumbImg.src) : null
+                    price: parseFloat(priceRaw) || 0, thumb: thumbImg ? thumbImg.src : null
                 });
             }
         }); return exportData;
@@ -731,16 +773,22 @@
 
     function saveCurrentProject(silent = false) {
         if (isViewOnlyMode) return;
-        const projectData = extractCurrentProjectData(false); const existingIndex = savedProjects.findIndex(p => p.id === projectData.id);
+        const projectData = extractCurrentProjectData(); const existingIndex = savedProjects.findIndex(p => p.id === projectData.id);
         if (existingIndex !== -1) { savedProjects[existingIndex] = projectData; } else { savedProjects.push(projectData); currentProjectId = projectData.id; }
-        localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects)); hasUnsavedChanges = false; 
-        if (!silent) {
-            const btn = document.getElementById('saveJoBtn'); const originalText = btn.innerHTML;
-            btn.innerHTML = "✅ Saved!"; setTimeout(() => { btn.innerHTML = originalText; }, 2000);
-        } else {
-            const statusLabel = document.getElementById('autosaveStatus'); const now = new Date();
-            statusLabel.innerText = "Autosaved at " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            statusLabel.style.opacity = "1"; setTimeout(() => { statusLabel.style.opacity = "0"; }, 4000);
+        
+        try {
+            localStorage.setItem('materialEstimatorProjects', JSON.stringify(savedProjects)); 
+            hasUnsavedChanges = false; 
+            if (!silent) {
+                const btn = document.getElementById('saveJoBtn'); const originalText = btn.innerHTML;
+                btn.innerHTML = "✅ Saved!"; setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+            } else {
+                const statusLabel = document.getElementById('autosaveStatus'); const now = new Date();
+                statusLabel.innerText = "Autosaved at " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                statusLabel.style.opacity = "1"; setTimeout(() => { statusLabel.style.opacity = "0"; }, 4000);
+            }
+        } catch(e) {
+            alert("⚠️ STORAGE LIMIT REACHED!\n\nYour browser's memory is full. Please delete some old projects in 'My Projects' to save new ones.");
         }
     }
 
@@ -771,7 +819,7 @@
         document.getElementById('layoutLinkInput').value = data.layout || ''; updateLayoutLinkUI();
         
         const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
-        if (data.i) { currentImageData = data.i; previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; } else { currentImageData = null; previewContainer.style.display = 'none'; preview.innerHTML = ''; }
+        if (data.i) { currentImageData = data.i; previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">`; } else { currentImageData = null; previewContainer.style.display = 'none'; preview.innerHTML = ''; }
         
         const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0]; table.innerHTML = '';
         
@@ -785,64 +833,73 @@
         calculate();
     }
 
-    function openShareCenter(makeViewOnly = false) {
-        const exportData = extractCurrentProjectData(true); delete exportData.id; const originalData = extractCurrentProjectData(false);
-        const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
-        const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
-        const baseUrl = window.location.href.split('?')[0].split('#')[0]; const viewParam = makeViewOnly ? "&view=1" : "";
-        cachedLongShareLink = `${baseUrl}?data=${compressedData}${viewParam}`;
-
-        document.getElementById('longShareLinkBox').value = cachedLongShareLink; document.getElementById('shortenWaterfallStatus').innerHTML = ""; document.getElementById('autoShortenBtn').style.display = "inline-flex"; document.getElementById('autoShortenBtn').disabled = false;
+    // --- V7.0 CLOUD BIN SHARING API ---
+    function openShareCenter() {
+        document.getElementById('longShareLinkBox').value = "";
+        document.getElementById('shortenWaterfallStatus').innerHTML = "";
         document.getElementById('shareCenterModal').style.display = 'flex';
-        if (hasExcludedImages) alert("Notice: A large pasted image was safely excluded from the link so it wouldn't crash the URL limit.");
+    }
+
+    async function generateCloudShareLink(isViewOnly) {
+        const btn1 = document.getElementById('cloudShareBtn');
+        const btn2 = document.getElementById('cloudShareViewBtn');
+        const activeBtn = isViewOnly ? btn2 : btn1;
+        const statusEl = document.getElementById('shortenWaterfallStatus');
+        
+        const originalText = activeBtn.innerHTML;
+        activeBtn.innerHTML = "⏳ Uploading JSON...";
+        btn1.disabled = true; btn2.disabled = true;
+        statusEl.innerHTML = "";
+
+        const exportData = extractCurrentProjectData();
+        delete exportData.id;
+
+        try {
+            // Push directly to a free JSON document host 
+            const response = await fetch('https://api.npoint.io/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exportData)
+            });
+            
+            if(!response.ok) throw new Error("Upload rejected.");
+            
+            const data = await response.json();
+
+            if(data && data.id) {
+                const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                const viewParam = isViewOnly ? "&view=1" : "";
+                const shortLink = `${baseUrl}?bin=${data.id}${viewParam}`;
+
+                document.getElementById('longShareLinkBox').value = shortLink;
+                statusEl.innerHTML = "✅ Secure Cloud Link Generated!<br><br><span style='color:var(--text-muted); font-weight: 500;'>This link includes your images and effortlessly bypasses network firewalls.</span>";
+            } else {
+                throw new Error("Invalid format returned.");
+            }
+        } catch(e) {
+            statusEl.innerHTML = "❌ Cloud upload failed. Check your internet connection.";
+        }
+        
+        activeBtn.innerHTML = originalText;
+        btn1.disabled = false; btn2.disabled = false;
     }
 
     async function copyBoxToClipboard(elementId, btnEl) {
         const text = document.getElementById(elementId).value;
+        if (!text) return;
         try { await navigator.clipboard.writeText(text); const originalText = btnEl.innerHTML; btnEl.innerHTML = "✅ Copied!"; btnEl.style.backgroundColor = "var(--ios-green)"; btnEl.style.color = "white"; setTimeout(() => { btnEl.innerHTML = originalText; btnEl.style.backgroundColor = ""; btnEl.style.color = ""; }, 2000); } catch (err) { alert("Failed to copy."); }
     }
 
-    // Direct TinyURL integration via proxy
-    async function runShortenerWaterfall() {
-        const btn = document.getElementById('autoShortenBtn'); 
-        const statusBox = document.getElementById('shortenWaterfallStatus'); 
-        btn.disabled = true; 
-        statusBox.style.color = "var(--text-main)";
-
-        if (cachedLongShareLink.length > 5000) { 
-            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`; 
-            btn.style.display = "none"; 
-            return; 
-        }
-
-        try { 
-            statusBox.innerHTML = "⏳ Attempting to shorten via TinyURL..."; 
-            const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cachedLongShareLink)}`;
-            
-            const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`); 
-            
-            if (res.ok) { 
-                const text = await res.text(); 
-                if (text && text.includes('tinyurl.com')) { 
-                    applyShortLink(text, "✅ Success via TinyURL!"); 
-                    return; 
-                } 
-            } 
-            throw new Error("TinyURL response invalid");
-        } catch (e) {
-            statusBox.innerHTML = `❌ <b>NETWORK FIREWALL BLOCKED THE SHORTENER</b><br><br>Your browser or network blocked the API. Please click "Copy Direct Link" above.`; 
-            btn.style.display = "none";
-        }
-    }
-    
-    function applyShortLink(url, successMsg) { document.getElementById('longShareLinkBox').value = url; document.getElementById('autoShortenBtn').style.display = "none"; document.getElementById('shortenWaterfallStatus').innerHTML = successMsg + "<br><br><span style='color:var(--ios-purple);'>The textbox above has been updated. Click Copy.</span>"; }
-
-    // =========================================================================
-    // V5.6 TREE LIBRARY ENGINE 
-    // =========================================================================
+    // --- TREE LIBRARY ENGINE ---
     let dragSrcData = null; 
 
-    function saveStorage() { localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials)); }
+    function saveStorage() { 
+        try {
+            localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials)); 
+        } catch(e) {
+            alert("⚠️ STORAGE LIMIT REACHED! Your browser's memory is full. Cannot save library updates.");
+        }
+    }
     function openLibraryManager() { document.getElementById('librarySearchInput').value = ''; document.getElementById('libraryModal').style.display = 'flex'; renderLibraryTree(); }
     function createTreeGroup() { if(!Array.isArray(savedMaterials)) savedMaterials = []; savedMaterials.push({ id: generateId(), type: 'group', name: 'New Folder', isOpen: true, items: [] }); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
     function createTreeItem() { if(!Array.isArray(savedMaterials) || savedMaterials.length === 0) createTreeGroup(); let newItem = { id: generateId(), name: "New Blank Material", price: 0, img: "" }; savedMaterials[savedMaterials.length - 1].items.push(newItem); savedMaterials[savedMaterials.length - 1].isOpen = true; saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
@@ -906,11 +963,7 @@
         });
     }
 
-    function handleDragStart(e, type, gIndex, iIndex = null) {
-        dragSrcData = { type, gIndex, iIndex }; e.dataTransfer.effectAllowed = 'move';
-        if(e.target.tagName === 'INPUT') { e.preventDefault(); return; }
-        e.dataTransfer.setData('text/html', e.currentTarget.innerHTML); setTimeout(() => e.target.style.opacity = '0.4', 0);
-    }
+    function handleDragStart(e, type, gIndex, iIndex = null) { dragSrcData = { type, gIndex, iIndex }; e.dataTransfer.effectAllowed = 'move'; if(e.target.tagName === 'INPUT') { e.preventDefault(); return; } e.dataTransfer.setData('text/html', e.currentTarget.innerHTML); setTimeout(() => e.target.style.opacity = '0.4', 0); }
     function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); return false; }
     function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
     function handleDrop(e, targetType, targetGIndex, targetIIndex = null) {
@@ -927,9 +980,18 @@
     function deleteTreeItem(gIndex, iIndex) { if(confirm("Delete this material?")) { savedMaterials[gIndex].items.splice(iIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
     function duplicateTreeItem(gIndex, iIndex) { let original = savedMaterials[gIndex].items[iIndex]; savedMaterials[gIndex].items.splice(iIndex + 1, 0, { ...original, id: generateId(), name: original.name + " (Copy)" }); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
     function deleteTreeGroup(gIndex) { if(confirm("Delete this entire folder and all its materials?")) { savedMaterials.splice(gIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
-    function uploadTreeThumb(gIndex, iIndex, inputEl) { if (!inputEl.files || !inputEl.files[0]) return; const labelBox = inputEl.closest('.tree-thumb'); uploadImage(inputEl.files[0], labelBox, (imgUrl) => { savedMaterials[gIndex].items[iIndex].img = imgUrl; saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }); }
+    
+    function uploadTreeThumb(gIndex, iIndex, inputEl) { 
+        if (!inputEl.files || !inputEl.files[0]) return; 
+        const labelBox = inputEl.closest('.tree-thumb'); 
+        processLocalImage(inputEl.files[0], labelBox, true, (imgUrl) => { 
+            savedMaterials[gIndex].items[iIndex].img = imgUrl; 
+            saveStorage(); 
+            renderLibraryTree(document.getElementById('librarySearchInput').value); 
+            inputEl.value = ''; 
+        }); 
+    }
 
-    // --- BULLETPROOF AUTOCOMPLETE ---
     function filterLibrary(textarea) {
         if (isViewOnlyMode) return; let val = textarea.value.toLowerCase(); let box = textarea.parentNode.querySelector('.suggestions-box'); if(box) box.innerHTML = '';
         let allItems = []; if(Array.isArray(savedMaterials)) { savedMaterials.forEach(g => { if(g && Array.isArray(g.items)) { g.items.forEach(i => { allItems.push({...i, groupName: g.name || "Folder"}); }); } }); }
@@ -959,7 +1021,6 @@
             priceInput.value = '₱' + parseFloat(matchedItem.price||0).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             if ((matchedItem.name||"").toLowerCase() === "printed sticker") uomInput.value = "sqin";
             
-            // Push READ-ONLY Thumbnail to row
             let thumbContainer = row.querySelector('.doc-thumb-box');
             if(thumbContainer) {
                 if (matchedItem.img) {
@@ -1014,15 +1075,8 @@
     function exportLibraryBackup() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "Facade_Tree_Library.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
     function importLibraryBackup(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { try { const importedData = JSON.parse(e.target.result); migrateAndSetLibrary(importedData); renderLibraryTree(); alert("Library restored successfully!"); } catch (error) { alert("Error reading backup file."); } }; reader.readAsText(file); } event.target.value = ''; }
 
-
-    // =========================================================================
-    // V5.6 DOCUMENT DRAG & DROP ENGINE 
-    // =========================================================================
-    let draggedDocRow = null; 
-    let draggedDocMode = null; 
-    let draggedRowsGroup = [];
-    let itemDragTopBound = null;
-    let itemDragBotBound = null;
+    // --- DOCUMENT DRAG & DROP ENGINE ---
+    let draggedDocRow = null; let draggedDocMode = null; let draggedRowsGroup = []; let itemDragTopBound = null; let itemDragBotBound = null;
 
     function initDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = true; }
     function endDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = false; }
@@ -1070,9 +1124,7 @@
                 let next = dropSectionHeader.nextElementSibling;
                 while(next && !next.classList.contains('section-row')) { targetTr = next; next = next.nextElementSibling; }
                 targetTr = targetTr.nextElementSibling;
-            } else {
-                targetTr = dropSectionHeader;
-            }
+            } else { targetTr = dropSectionHeader; }
             if(!targetTr) targetTr = tbody.lastElementChild;
         }
 
@@ -1116,26 +1168,32 @@
     function docDragEnd(e) { document.querySelectorAll('.doc-drag-over').forEach(el => el.classList.remove('doc-drag-over')); draggedDocRow = null; draggedRowsGroup = []; }
 
     // --- ROW GENERATION ---
-    function processImageDrop(file) {
+    function processImageDrop(file, inputEl) {
         if (isViewOnlyMode) return;
-        if (file && file.type.startsWith('image/')) {
+        if (file) {
             const label = document.querySelector('#mainImageDropZone label');
-            uploadImage(file, label, (imgUrl) => {
+            processLocalImage(file, label, false, (imgUrl) => {
                 currentImageData = imgUrl; const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
-                previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; markUnsaved(); if(!isRestoring) saveState();
+                previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">`; 
+                if (inputEl) inputEl.value = ''; 
+                
+                setTimeout(() => { markUnsaved(); if(!isRestoring) saveState(); }, 50);
             });
         }
     }
-    document.getElementById('projectImage').addEventListener('change', function(event) { processImageDrop(event.target.files[0]); });
+    
+    document.getElementById('projectImage').addEventListener('change', function(event) { processImageDrop(event.target.files[0], this); });
+    
     document.addEventListener('paste', function(event) {
         if (isViewOnlyMode) return; if(event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        for (let index in items) { const item = items[index]; if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile()); }
+        for (let index in items) { const item = items[index]; if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile(), null); }
     });
+    
     const dropZone = document.getElementById('mainImageDropZone');
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); if(!isViewOnlyMode) dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0]); });
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0], null); });
 
     function addRowToSection(btn) { const summaryRow = btn.closest('tr'); addRow("", "", "", "", false, "", "Laser", summaryRow); }
 
@@ -1146,12 +1204,11 @@
         
         let formattedPrice = (price !== "" && price !== null && parseFloat(price) > 0) ? '₱' + parseFloat(price).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '';
 
-        // V5.6 FIX: Removed input element for upload. Set div to act as a pure viewer.
         newRow.innerHTML = `
             <td class="drag-td no-print" style="vertical-align: middle; text-align: center;"><span class="drag-handle" onmousedown="initDocDrag(this)" onmouseup="endDocDrag(this)" onmouseleave="endDocDrag(this)">⋮⋮</span></td>
             <td>
                 <div style="display: flex; gap: 8px;">
-                    <div class="doc-thumb-box no-print" style="width: 42px; height: 42px; border-radius: 6px; background: #e5e5ea; border: 1px dashed #c7c7cc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: ${thumbUrl ? 'pointer' : 'default'};" ${thumbUrl ? `onclick="openLightbox('${thumbUrl}')"` : ''}>
+                    <div class="doc-thumb-box no-print" style="width: 42px; height: 42px; border-radius: 6px; background: #e5e5ea; border: 1px dashed #c7c7cc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: ${thumbUrl ? 'pointer' : 'default'};" ${thumbUrl ? `onclick="if(this.querySelector('img')) openLightbox(this.querySelector('img').getAttribute('src'))"` : ''}>
                         ${thumbUrl ? `<img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:16px; opacity: 0.3;">🚫</span>`}
                     </div>
                     <div style="flex-grow: 1; position: relative;">
@@ -1198,7 +1255,7 @@
                     <div class="section-img-wrapper">
                         <div style="display:flex; align-items:center; gap: 10px;">
                             <label class="no-print" style="cursor:pointer; margin:0; background:#e5e5ea; color:#1d1d1f; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;"><span class="img-label-text">${imgSrc ? '🔄 Change Image' : '🖼️ Add Image'}</span><input type="file" accept="image/*" style="display:none;" onchange="handleSectionImage(this)"></label>
-                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer;" onclick="openLightbox(this.src)">
+                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">
                         </div>
                     </div>
                 </div>
@@ -1219,8 +1276,18 @@
     function handleSectionImage(input) {
         if (isViewOnlyMode) return;
         if (input.files && input.files[0]) {
-            const wrapper = input.closest('.section-img-wrapper'); const labelEl = input.closest('label').querySelector('.img-label-text');
-            uploadImage(input.files[0], labelEl, (imgUrl) => { const img = wrapper.querySelector('.sec-img-preview'); img.src = imgUrl; img.style.display = 'block'; labelEl.innerText = '🔄 Change Image'; markUnsaved(); if(!isRestoring) saveState(); });
+            const wrapper = input.closest('.section-img-wrapper'); 
+            const labelEl = wrapper.querySelector('.img-label-text');
+            
+            processLocalImage(input.files[0], labelEl, false, (imgUrl) => { 
+                const img = wrapper.querySelector('.sec-img-preview'); 
+                img.src = imgUrl; 
+                img.style.display = 'block'; 
+                labelEl.innerText = '🔄 Change Image'; 
+                input.value = ''; 
+                
+                setTimeout(() => { markUnsaved(); if(!isRestoring) saveState(); }, 50);
+            });
         }
     }
 
