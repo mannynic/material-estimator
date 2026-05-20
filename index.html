@@ -210,7 +210,7 @@
         /* Table row drag styling */
         .doc-drag-over td { border-top: 2px solid var(--ios-blue) !important; background: rgba(0, 122, 255, 0.02); }
 
-        /* --- V6.1 Tree View Architecture --- */
+        /* --- V5.6 Tree View Architecture --- */
         .tree-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; user-select: none; }
         .tree-group-wrap { margin-bottom: 4px; }
         .tree-group-header { display: flex; align-items: center; background: #f5f5f7; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; transition: background 0.1s; }
@@ -362,7 +362,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v6.1 (ImgBB Base64 Payload Fix)
+    Build v5.6 (Read-Only Row Thumbs & Lightbox)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -463,7 +463,7 @@
 
 <script>
     // ==========================================
-    // IMGBB API KEY
+    // IMGBB API KEY SECURED & ACTIVE
     const IMGBB_API_KEY = "c2bdac3065be1e1346bdb440b2287d48"; 
     // ==========================================
 
@@ -586,62 +586,40 @@
     // --- UNIVERSAL LIGHTBOX ENGINE ---
     function openLightbox(src) {
         if (!src) return;
-        const img = document.getElementById('lightboxImage');
-        img.style.display = 'block';
-        img.src = src;
+        document.getElementById('lightboxImage').src = src;
         document.getElementById('lightboxModal').style.display = 'flex';
     }
 
-    // --- V6.1 FIXED IMGBB UPLOAD ENGINE (BASE64 PAYLOAD) ---
-    function uploadImage(file, labelElement, callback) {
-        if (!file || !file.type.startsWith('image/')) return;
-        
-        let isThumbBox = labelElement && labelElement.classList && labelElement.classList.contains('tree-thumb');
-        let originalContent = labelElement ? labelElement.innerHTML : '';
-        
-        if (labelElement) {
-            if(isThumbBox) labelElement.innerHTML = `<span style="font-size:10px;">⏳</span>`; 
-            else labelElement.innerHTML = `<span style="display:block;">⏳</span>Uploading...`; 
-        }
-
-        const finalizeError = (msg) => {
-            if (labelElement) labelElement.innerHTML = originalContent;
-            alert("⚠️ UPLOAD FAILED\n\n" + msg);
-        };
-
-        // 1. We must read the file into a Base64 string first to bypass browser local file restrictions.
+    // --- HYBRID IMAGE ENGINE ---
+    function compressImage(file, callback) {
         const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 500; let width = img.width, height = img.height;
+                if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+                canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.5));
+            }
+            img.src = e.target.result;
+        }
         reader.readAsDataURL(file);
-        reader.onload = function(event) {
-            // event.target.result looks like "data:image/jpeg;base64,/9j/4AAQSk..."
-            // We split on the comma to isolate just the raw text code.
-            const base64Data = event.target.result.split(',')[1];
+    }
 
-            // 2. Attach the raw string to the form, exactly like the ImgBB docs recommend.
-            let formData = new FormData();
-            formData.append("image", base64Data);
+    function uploadImage(file, labelElement, callback) {
+        if (IMGBB_API_KEY && IMGBB_API_KEY.trim() !== "") {
+            let formData = new FormData(); formData.append("image", file);
+            let isThumbBox = labelElement.classList && labelElement.classList.contains('tree-thumb');
+            let originalContent = labelElement.innerHTML;
+            
+            if(isThumbBox) { labelElement.innerHTML = `<span style="font-size:10px;">⏳</span>`; } 
+            else { let iconSpan = labelElement.querySelector('span'); if(iconSpan) labelElement.innerHTML = `<span style="display:block;">⏳</span>Uploading...`; else labelElement.innerText = "⏳ Uploading..."; }
 
-            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                method: "POST",
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    if (labelElement) labelElement.innerHTML = originalContent;
-                    callback(data.data.url); // ImgBB gives us a clean public URL back!
-                } else {
-                    finalizeError("ImgBB API rejected the upload. Error: " + (data.error ? data.error.message : "Unknown"));
-                }
-            })
-            .catch(err => {
-                finalizeError("Network blocked the connection to ImgBB. Please check your internet connection.");
-                console.error(err);
-            });
-        };
-        reader.onerror = function() {
-            finalizeError("Could not read the local file from your device.");
-        };
+            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData })
+            .then(res => res.json()).then(data => {
+                if(data.success) { callback(data.data.url); } else { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload failed."); }
+            }).catch(err => { if(!isThumbBox) labelElement.innerHTML = originalContent; alert("Upload error."); });
+        } else { compressImage(file, callback); }
     }
 
     function updateLayoutLinkUI() {
@@ -649,7 +627,7 @@
         if(link) { display.style.display = 'flex'; let finalLink = link; if(!finalLink.startsWith('http')) finalLink = 'https://' + finalLink; anchor.href = finalLink; } else { display.style.display = 'none'; }
     }
 
-    // --- TREE DATA MIGRATION ---
+    // --- V5.6 BULLETPROOF TREE DATA MIGRATION ---
     function generateId() { return Math.random().toString(36).substr(2, 9); }
 
     function loadDefaultTree() {
@@ -699,6 +677,7 @@
             } catch (e) { alert("⚠️ ERROR LOADING DATA"); setupDefaultTable(); }
         } else { setupDefaultTable(); }
         
+        // Attach Document Drag Listeners securely
         const tbody = document.querySelector("#materialsTable tbody");
         tbody.addEventListener('dragover', docDragOver);
         tbody.addEventListener('drop', docDrop);
@@ -712,6 +691,7 @@
         });
         document.querySelectorAll('.mult-container').forEach(el => { el.style.background = 'transparent'; el.style.border = 'none'; });
         
+        // Hiding actionable buttons but keeping handles visible structurally
         const elementsToHide = document.querySelectorAll(`.header-actions button, .actions-bar div:first-child, #saveLibBtn, button[onclick="openLibraryManager()"], .btn-remove, .cut-inactive, .remove-cut-btn, #mainImageDropZone, #layoutInputLabel, #layoutLinkInput, label.no-print, .actions-bar span, .add-material-btn, .drag-handle`);
         
         elementsToHide.forEach(el => { if(el) el.style.display = 'none'; });
@@ -723,7 +703,6 @@
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; calculate(); }
 
     function extractCurrentProjectData(sanitizeForUrl = false) {
-        // Strip base64 data to prevent crashing URL limit, but KEEP valid ImgBB URLs (http)
         const safeImage = (imgStr) => { if (!imgStr) return null; if (sanitizeForUrl && imgStr.startsWith('data:image')) return null; return imgStr; };
         const exportData = {
             id: currentProjectId || Date.now().toString(),
@@ -792,7 +771,7 @@
         document.getElementById('layoutLinkInput').value = data.layout || ''; updateLayoutLinkUI();
         
         const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
-        if (data.i) { currentImageData = data.i; previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">`; } else { currentImageData = null; previewContainer.style.display = 'none'; preview.innerHTML = ''; }
+        if (data.i) { currentImageData = data.i; previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; } else { currentImageData = null; previewContainer.style.display = 'none'; preview.innerHTML = ''; }
         
         const table = document.getElementById("materialsTable").getElementsByTagName("tbody")[0]; table.innerHTML = '';
         
@@ -807,18 +786,15 @@
     }
 
     function openShareCenter(makeViewOnly = false) {
-        const exportData = extractCurrentProjectData(true); delete exportData.id; 
-        const originalData = extractCurrentProjectData(false);
+        const exportData = extractCurrentProjectData(true); delete exportData.id; const originalData = extractCurrentProjectData(false);
         const hasExcludedImages = (JSON.stringify(originalData).includes('data:image') && !JSON.stringify(exportData).includes('data:image'));
-        
         const compressedData = LZString.compressToEncodedURIComponent(JSON.stringify(exportData));
         const baseUrl = window.location.href.split('?')[0].split('#')[0]; const viewParam = makeViewOnly ? "&view=1" : "";
         cachedLongShareLink = `${baseUrl}?data=${compressedData}${viewParam}`;
 
         document.getElementById('longShareLinkBox').value = cachedLongShareLink; document.getElementById('shortenWaterfallStatus').innerHTML = ""; document.getElementById('autoShortenBtn').style.display = "inline-flex"; document.getElementById('autoShortenBtn').disabled = false;
         document.getElementById('shareCenterModal').style.display = 'flex';
-        
-        if (hasExcludedImages) alert("Notice: A base64 compressed image was safely excluded from the link so it wouldn't crash the URL limit.");
+        if (hasExcludedImages) alert("Notice: A large pasted image was safely excluded from the link so it wouldn't crash the URL limit.");
     }
 
     async function copyBoxToClipboard(elementId, btnEl) {
@@ -826,6 +802,7 @@
         try { await navigator.clipboard.writeText(text); const originalText = btnEl.innerHTML; btnEl.innerHTML = "✅ Copied!"; btnEl.style.backgroundColor = "var(--ios-green)"; btnEl.style.color = "white"; setTimeout(() => { btnEl.innerHTML = originalText; btnEl.style.backgroundColor = ""; btnEl.style.color = ""; }, 2000); } catch (err) { alert("Failed to copy."); }
     }
 
+    // Direct TinyURL integration via proxy
     async function runShortenerWaterfall() {
         const btn = document.getElementById('autoShortenBtn'); 
         const statusBox = document.getElementById('shortenWaterfallStatus'); 
@@ -833,7 +810,7 @@
         statusBox.style.color = "var(--text-main)";
 
         if (cachedLongShareLink.length > 5000) { 
-            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`; 
+            statusBox.innerHTML = `⚠️ <b>URL IS TOO MASSIVE.</b><br><br>The data you are trying to share makes the URL ${cachedLongShareLink.length} characters long. Public shorteners will reject this.<br><br><span style="color:var(--ios-red);">You must copy the Long Direct Link above.</span>`; 
             btn.style.display = "none"; 
             return; 
         }
@@ -841,6 +818,7 @@
         try { 
             statusBox.innerHTML = "⏳ Attempting to shorten via TinyURL..."; 
             const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(cachedLongShareLink)}`;
+            
             const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`); 
             
             if (res.ok) { 
@@ -859,7 +837,9 @@
     
     function applyShortLink(url, successMsg) { document.getElementById('longShareLinkBox').value = url; document.getElementById('autoShortenBtn').style.display = "none"; document.getElementById('shortenWaterfallStatus').innerHTML = successMsg + "<br><br><span style='color:var(--ios-purple);'>The textbox above has been updated. Click Copy.</span>"; }
 
-    // --- TREE LIBRARY ENGINE ---
+    // =========================================================================
+    // V5.6 TREE LIBRARY ENGINE 
+    // =========================================================================
     let dragSrcData = null; 
 
     function saveStorage() { localStorage.setItem('materialEstimatorLibrary', JSON.stringify(savedMaterials)); }
@@ -926,7 +906,11 @@
         });
     }
 
-    function handleDragStart(e, type, gIndex, iIndex = null) { dragSrcData = { type, gIndex, iIndex }; e.dataTransfer.effectAllowed = 'move'; if(e.target.tagName === 'INPUT') { e.preventDefault(); return; } e.dataTransfer.setData('text/html', e.currentTarget.innerHTML); setTimeout(() => e.target.style.opacity = '0.4', 0); }
+    function handleDragStart(e, type, gIndex, iIndex = null) {
+        dragSrcData = { type, gIndex, iIndex }; e.dataTransfer.effectAllowed = 'move';
+        if(e.target.tagName === 'INPUT') { e.preventDefault(); return; }
+        e.dataTransfer.setData('text/html', e.currentTarget.innerHTML); setTimeout(() => e.target.style.opacity = '0.4', 0);
+    }
     function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; e.currentTarget.classList.add('drag-over'); return false; }
     function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
     function handleDrop(e, targetType, targetGIndex, targetIIndex = null) {
@@ -943,18 +927,9 @@
     function deleteTreeItem(gIndex, iIndex) { if(confirm("Delete this material?")) { savedMaterials[gIndex].items.splice(iIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
     function duplicateTreeItem(gIndex, iIndex) { let original = savedMaterials[gIndex].items[iIndex]; savedMaterials[gIndex].items.splice(iIndex + 1, 0, { ...original, id: generateId(), name: original.name + " (Copy)" }); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }
     function deleteTreeGroup(gIndex) { if(confirm("Delete this entire folder and all its materials?")) { savedMaterials.splice(gIndex, 1); saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); } }
-    
-    function uploadTreeThumb(gIndex, iIndex, inputEl) { 
-        if (!inputEl.files || !inputEl.files[0]) return; 
-        const labelBox = inputEl.closest('.tree-thumb'); 
-        uploadImage(inputEl.files[0], labelBox, (imgUrl) => { 
-            savedMaterials[gIndex].items[iIndex].img = imgUrl; 
-            saveStorage(); 
-            renderLibraryTree(document.getElementById('librarySearchInput').value); 
-            inputEl.value = ''; 
-        }); 
-    }
+    function uploadTreeThumb(gIndex, iIndex, inputEl) { if (!inputEl.files || !inputEl.files[0]) return; const labelBox = inputEl.closest('.tree-thumb'); uploadImage(inputEl.files[0], labelBox, (imgUrl) => { savedMaterials[gIndex].items[iIndex].img = imgUrl; saveStorage(); renderLibraryTree(document.getElementById('librarySearchInput').value); }); }
 
+    // --- BULLETPROOF AUTOCOMPLETE ---
     function filterLibrary(textarea) {
         if (isViewOnlyMode) return; let val = textarea.value.toLowerCase(); let box = textarea.parentNode.querySelector('.suggestions-box'); if(box) box.innerHTML = '';
         let allItems = []; if(Array.isArray(savedMaterials)) { savedMaterials.forEach(g => { if(g && Array.isArray(g.items)) { g.items.forEach(i => { allItems.push({...i, groupName: g.name || "Folder"}); }); } }); }
@@ -984,6 +959,7 @@
             priceInput.value = '₱' + parseFloat(matchedItem.price||0).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             if ((matchedItem.name||"").toLowerCase() === "printed sticker") uomInput.value = "sqin";
             
+            // Push READ-ONLY Thumbnail to row
             let thumbContainer = row.querySelector('.doc-thumb-box');
             if(thumbContainer) {
                 if (matchedItem.img) {
@@ -1038,8 +1014,15 @@
     function exportLibraryBackup() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedMaterials)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "Facade_Tree_Library.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
     function importLibraryBackup(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { try { const importedData = JSON.parse(e.target.result); migrateAndSetLibrary(importedData); renderLibraryTree(); alert("Library restored successfully!"); } catch (error) { alert("Error reading backup file."); } }; reader.readAsText(file); } event.target.value = ''; }
 
-    // --- DOCUMENT DRAG & DROP ENGINE ---
-    let draggedDocRow = null; let draggedDocMode = null; let draggedRowsGroup = []; let itemDragTopBound = null; let itemDragBotBound = null;
+
+    // =========================================================================
+    // V5.6 DOCUMENT DRAG & DROP ENGINE 
+    // =========================================================================
+    let draggedDocRow = null; 
+    let draggedDocMode = null; 
+    let draggedRowsGroup = [];
+    let itemDragTopBound = null;
+    let itemDragBotBound = null;
 
     function initDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = true; }
     function endDocDrag(handle) { let tr = handle.closest('tr'); tr.draggable = false; }
@@ -1087,7 +1070,9 @@
                 let next = dropSectionHeader.nextElementSibling;
                 while(next && !next.classList.contains('section-row')) { targetTr = next; next = next.nextElementSibling; }
                 targetTr = targetTr.nextElementSibling;
-            } else { targetTr = dropSectionHeader; }
+            } else {
+                targetTr = dropSectionHeader;
+            }
             if(!targetTr) targetTr = tbody.lastElementChild;
         }
 
@@ -1131,30 +1116,26 @@
     function docDragEnd(e) { document.querySelectorAll('.doc-drag-over').forEach(el => el.classList.remove('doc-drag-over')); draggedDocRow = null; draggedRowsGroup = []; }
 
     // --- ROW GENERATION ---
-    function processImageDrop(file, inputEl) {
+    function processImageDrop(file) {
         if (isViewOnlyMode) return;
         if (file && file.type.startsWith('image/')) {
             const label = document.querySelector('#mainImageDropZone label');
             uploadImage(file, label, (imgUrl) => {
                 currentImageData = imgUrl; const previewContainer = document.getElementById('imagePreviewContainer'); const preview = document.getElementById('imagePreview');
-                previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">`; markUnsaved(); if(!isRestoring) saveState();
-                if (inputEl) inputEl.value = ''; 
+                previewContainer.style.display = 'flex'; preview.innerHTML = `<img src="${currentImageData}" alt="Project Image" style="cursor: pointer;" onclick="openLightbox(this.src)">`; markUnsaved(); if(!isRestoring) saveState();
             });
         }
     }
-    
-    document.getElementById('projectImage').addEventListener('change', function(event) { processImageDrop(event.target.files[0], this); });
-    
+    document.getElementById('projectImage').addEventListener('change', function(event) { processImageDrop(event.target.files[0]); });
     document.addEventListener('paste', function(event) {
         if (isViewOnlyMode) return; if(event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        for (let index in items) { const item = items[index]; if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile(), null); }
+        for (let index in items) { const item = items[index]; if (item.kind === 'file' && item.type.startsWith('image/')) processImageDrop(item.getAsFile()); }
     });
-    
     const dropZone = document.getElementById('mainImageDropZone');
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); if(!isViewOnlyMode) dropZone.classList.add('drag-over'); });
     dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); });
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0], null); });
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (!isViewOnlyMode && e.dataTransfer.files && e.dataTransfer.files[0]) processImageDrop(e.dataTransfer.files[0]); });
 
     function addRowToSection(btn) { const summaryRow = btn.closest('tr'); addRow("", "", "", "", false, "", "Laser", summaryRow); }
 
@@ -1165,11 +1146,12 @@
         
         let formattedPrice = (price !== "" && price !== null && parseFloat(price) > 0) ? '₱' + parseFloat(price).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '';
 
+        // V5.6 FIX: Removed input element for upload. Set div to act as a pure viewer.
         newRow.innerHTML = `
             <td class="drag-td no-print" style="vertical-align: middle; text-align: center;"><span class="drag-handle" onmousedown="initDocDrag(this)" onmouseup="endDocDrag(this)" onmouseleave="endDocDrag(this)">⋮⋮</span></td>
             <td>
                 <div style="display: flex; gap: 8px;">
-                    <div class="doc-thumb-box no-print" style="width: 42px; height: 42px; border-radius: 6px; background: #e5e5ea; border: 1px dashed #c7c7cc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: ${thumbUrl ? 'pointer' : 'default'};" ${thumbUrl ? `onclick="if(this.querySelector('img')) openLightbox(this.querySelector('img').getAttribute('src'))"` : ''}>
+                    <div class="doc-thumb-box no-print" style="width: 42px; height: 42px; border-radius: 6px; background: #e5e5ea; border: 1px dashed #c7c7cc; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: ${thumbUrl ? 'pointer' : 'default'};" ${thumbUrl ? `onclick="openLightbox('${thumbUrl}')"` : ''}>
                         ${thumbUrl ? `<img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:16px; opacity: 0.3;">🚫</span>`}
                     </div>
                     <div style="flex-grow: 1; position: relative;">
@@ -1216,7 +1198,7 @@
                     <div class="section-img-wrapper">
                         <div style="display:flex; align-items:center; gap: 10px;">
                             <label class="no-print" style="cursor:pointer; margin:0; background:#e5e5ea; color:#1d1d1f; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600;"><span class="img-label-text">${imgSrc ? '🔄 Change Image' : '🖼️ Add Image'}</span><input type="file" accept="image/*" style="display:none;" onchange="handleSectionImage(this)"></label>
-                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer;" onclick="openLightbox(this.getAttribute('src'))">
+                            <img class="sec-img-preview" src="${imgSrc || ''}" style="display:${imgSrc ? 'block' : 'none'}; height: 80px; max-width: 200px; object-fit: contain; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer;" onclick="openLightbox(this.src)">
                         </div>
                     </div>
                 </div>
@@ -1238,7 +1220,7 @@
         if (isViewOnlyMode) return;
         if (input.files && input.files[0]) {
             const wrapper = input.closest('.section-img-wrapper'); const labelEl = input.closest('label').querySelector('.img-label-text');
-            uploadImage(input.files[0], labelEl, (imgUrl) => { const img = wrapper.querySelector('.sec-img-preview'); img.src = imgUrl; img.style.display = 'block'; labelEl.innerText = '🔄 Change Image'; markUnsaved(); if(!isRestoring) saveState(); input.value = ''; });
+            uploadImage(input.files[0], labelEl, (imgUrl) => { const img = wrapper.querySelector('.sec-img-preview'); img.src = imgUrl; img.style.display = 'block'; labelEl.innerText = '🔄 Change Image'; markUnsaved(); if(!isRestoring) saveState(); });
         }
     }
 
