@@ -204,7 +204,7 @@
         .drag-handle:active { cursor: grabbing; color: var(--ios-blue); }
         .doc-drag-over td { border-top: 2px solid var(--ios-blue) !important; background: rgba(0, 122, 255, 0.02); }
 
-        /* --- V7.2 Tree View Architecture --- */
+        /* --- V7.3 Tree View Architecture --- */
         .tree-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; user-select: none; }
         .tree-group-wrap { margin-bottom: 4px; }
         .tree-group-header { display: flex; align-items: center; background: #f5f5f7; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; transition: background 0.1s; }
@@ -355,7 +355,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v7.2 (Blob Export / Smart Cache Sync)
+    Build v7.3 (Cross-Tab App Clipboard)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -441,6 +441,7 @@
         <div>
             <button class="btn btn-primary" onclick="addRow()">+ Material</button>
             <button class="btn btn-section" onclick="addSection()">+ Section</button>
+            <button class="btn btn-manage" onclick="pasteSectionFromClipboard()" id="pasteSectionBtn" style="background: rgba(0,0,0,0.05);">📋 Paste Section</button>
             <span style="margin: 0 10px; color:var(--border-color);">|</span>
             <button class="btn btn-share" onclick="openShareCenter()">🔗 Share Project</button>
         </div>
@@ -668,13 +669,11 @@
         let cloudData = null;
         let localData = null;
 
-        // 1. Check Local Memory First
         try {
             const stored = localStorage.getItem('materialEstimatorLibrary');
             if (stored) localData = JSON.parse(stored);
         } catch(e) {}
 
-        // 2. Fetch from GitHub Master
         try {
             const response = await fetch('library.json?t=' + new Date().getTime());
             if (response.ok) { cloudData = await response.json(); }
@@ -682,17 +681,15 @@
             console.warn("Could not load from GitHub. Relying on local cache."); 
         }
 
-        // 3. The Smart Cache Merge (Fixes GitHub Deploy Delays)
         if (cloudData) {
             if (localData) {
-                // Rescue local images that GitHub might be missing due to cache delay
                 cloudData.forEach(cGroup => {
                     let lGroup = localData.find(g => g.name === cGroup.name);
                     if (lGroup && lGroup.items && cGroup.items) {
                         cGroup.items.forEach(cItem => {
                             let lItem = lGroup.items.find(i => i.name === cItem.name);
                             if (!cItem.img && lItem && lItem.img) {
-                                cItem.img = lItem.img; // Rescue the image!
+                                cItem.img = lItem.img; 
                             }
                         });
                     }
@@ -1099,9 +1096,7 @@
         } else { alert("Please enter a material description before saving."); }
     }
 
-    // --- V7.2 BLOB EXPORT ENGINE (Fixes the Data URI Truncation Bug) ---
     function exportLibraryBackup() { 
-        // Use Blob instead of Data URI to bypass all browser string length limits
         const jsonStr = JSON.stringify(savedMaterials, null, 2);
         const blob = new Blob([jsonStr], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -1114,7 +1109,7 @@
         downloadAnchorNode.click(); 
         document.body.removeChild(downloadAnchorNode);
         
-        URL.revokeObjectURL(url); // Clean up memory
+        URL.revokeObjectURL(url); 
     }
 
     function importLibraryBackup(event) { 
@@ -1134,6 +1129,90 @@
             reader.readAsText(file); 
         } 
         event.target.value = ''; 
+    }
+
+    // --- V7.3 CROSS-TAB APP CLIPBOARD ENGINE ---
+    function copySectionToClipboard(btn) {
+        if (isViewOnlyMode) return;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳...";
+        
+        const sectionRow = btn.closest('tr');
+        const title = sectionRow.querySelector('.section-input').value;
+        const multInput = sectionRow.querySelector('.section-multiplier');
+        const mult = multInput ? (parseFloat(multInput.value) || 1) : 1;
+        const imgEl = sectionRow.querySelector('.sec-img-preview');
+        const img = (imgEl && imgEl.style.display !== 'none') ? imgEl.src : null;
+        
+        const clipboardData = {
+            type: 'section_group',
+            title: title,
+            mult: mult,
+            img: img,
+            items: []
+        };
+
+        let nextRow = sectionRow.nextElementSibling;
+        
+        if (nextRow && nextRow.classList.contains('section-labels-row')) {
+            nextRow = nextRow.nextElementSibling;
+        }
+
+        while (nextRow && !nextRow.classList.contains('section-row')) {
+            if (nextRow.classList.contains('item-row')) {
+                const isCutActive = nextRow.querySelector('.cut-active').style.display === 'flex';
+                const priceRaw = nextRow.querySelector('.price').value.replace(/[^0-9.]/g, "");
+                const thumbImg = nextRow.querySelector('.doc-thumb-box img');
+                
+                clipboardData.items.push({
+                    desc: nextRow.querySelector('.desc').value,
+                    hasCut: isCutActive,
+                    cutTime: isCutActive ? nextRow.querySelector('.cut-time').value : "",
+                    cutMachine: isCutActive ? nextRow.querySelector('.cut-machine').value : "Laser",
+                    qty: nextRow.querySelector('.qty').value,
+                    uom: nextRow.querySelector('.uom').value,
+                    price: parseFloat(priceRaw) || 0,
+                    thumb: thumbImg ? thumbImg.src : null
+                });
+            }
+            nextRow = nextRow.nextElementSibling;
+        }
+
+        try {
+            localStorage.setItem('materialEstimatorClipboard', JSON.stringify(clipboardData));
+            btn.innerHTML = "✅ COPIED";
+            btn.style.color = "var(--ios-green)";
+        } catch(e) {
+            alert("Clipboard full! Your section image might be too massive for the local cache.");
+            btn.innerHTML = "❌ ERROR";
+        }
+
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.color = ""; }, 2000);
+    }
+
+    function pasteSectionFromClipboard() {
+        if (isViewOnlyMode) return;
+        try {
+            const dataStr = localStorage.getItem('materialEstimatorClipboard');
+            if (!dataStr) { alert("Clipboard is empty! Copy a section first."); return; }
+            
+            const data = JSON.parse(dataStr);
+            if (data.type !== 'section_group') { alert("Invalid clipboard data."); return; }
+
+            addSection(data.title, data.img, data.mult);
+            
+            data.items.forEach(item => {
+                addRow(item.desc, item.qty, item.uom, item.price, item.hasCut, item.cutTime, item.cutMachine, null, item.thumb);
+            });
+            
+            const btn = document.getElementById('pasteSectionBtn');
+            const orig = btn.innerHTML;
+            btn.innerHTML = "✅ Pasted!";
+            setTimeout(() => btn.innerHTML = orig, 2000);
+            
+        } catch(e) {
+            alert("Could not paste data.");
+        }
     }
 
     // --- DOCUMENT DRAG & DROP ENGINE ---
@@ -1321,7 +1400,10 @@
                     </div>
                 </div>
             </td>
-            <td class="no-print" style="vertical-align: bottom; padding-bottom: 10px;"><button class="btn btn-remove" onclick="removeSection(this)">✕</button></td>
+            <td class="no-print" style="vertical-align: bottom; padding-bottom: 10px; text-align: right; width: 80px;">
+                <button class="btn btn-manage" style="padding: 6px 8px; margin-bottom: 6px; font-size: 11px; width: 100%; letter-spacing: 0.5px;" onclick="copySectionToClipboard(this)">📋 COPY</button><br>
+                <button class="btn btn-remove" style="padding: 6px 8px; margin: 0; font-size: 11px; width: 100%; letter-spacing: 0.5px;" onclick="removeSection(this)">✕ DEL</button>
+            </td>
         `;
 
         const labelsRow = table.insertRow(); labelsRow.className = "section-labels-row";
