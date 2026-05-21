@@ -204,7 +204,7 @@
         .drag-handle:active { cursor: grabbing; color: var(--ios-blue); }
         .doc-drag-over td { border-top: 2px solid var(--ios-blue) !important; background: rgba(0, 122, 255, 0.02); }
 
-        /* --- V7.3 Tree View Architecture --- */
+        /* --- V7.4 Tree View Architecture --- */
         .tree-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; user-select: none; }
         .tree-group-wrap { margin-bottom: 4px; }
         .tree-group-header { display: flex; align-items: center; background: #f5f5f7; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; transition: background 0.1s; }
@@ -355,7 +355,7 @@
 </div>
 
 <div id="buildVersion" class="no-print" style="position: absolute; top: 12px; right: 20px; font-size: 11px; font-weight: 700; color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); padding: 5px 10px; border-radius: 8px; letter-spacing: 0.5px; z-index: 100;">
-    Build v7.3 (Cross-Tab App Clipboard)
+    Build v7.4 (Smart Fraction Engine)
 </div>
 
 <div class="container" id="contentToPrint">
@@ -544,11 +544,26 @@
     // --- SMART AREA/DIMENSION ENGINE ---
     function parseQuantity(str, targetUom = "") {
         if (!str) return 0; str = str.toString().toLowerCase().trim(); targetUom = targetUom.toLowerCase().trim();
+        
+        // Smart fraction parser helper
+        function parseSingle(valStr) {
+            valStr = valStr.replace(/&/g, ' ').replace(/\band\b/g, ' ').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+            if (valStr.includes('/')) {
+                let p = valStr.split(' ');
+                let frac = p[p.length - 1];
+                let whole = p.length > 1 ? parseFloat(p[0]) || 0 : 0;
+                let [n, d] = frac.split('/');
+                return whole + ((parseFloat(n) || 0) / (parseFloat(d) || 1));
+            }
+            return parseFloat(valStr.replace(/[^0-9.]/g, '')) || 0;
+        }
+
         if (str.includes('x') || str.includes('*')) {
             let parts = str.replace(/\*/g, 'x').split('x').map(p => p.trim());
             let inputUnit = null;
             if (str.includes('cm')) inputUnit = 'cm'; else if (str.includes('mm')) inputUnit = 'mm'; else if (str.includes('in') || str.includes('"')) inputUnit = 'in'; else if (str.includes('ft') || str.includes("'")) inputUnit = 'ft'; else if (str.includes('m') && !str.includes('mm') && !str.includes('cm')) inputUnit = 'm';
-            let vals = parts.map(p => parseFloat(p.replace(/[^0-9.]/g, '')) || 0);
+            
+            let vals = parts.map(p => parseSingle(p));
             if (vals.length !== 2) return vals.reduce((a, b) => a * b, 1);
             let area = vals[0] * vals[1];
             if (!inputUnit) {
@@ -563,10 +578,8 @@
             if (targetUom === 'sht' || targetUom === 'sheet') return areaInSqFeet / 32; 
             return area; 
         }
-        if (str.includes('/')) {
-            let parts = str.split(' '); let fractionPart = parts.length > 1 ? parts[1] : parts[0]; let wholePart = parts.length > 1 ? parseFloat(parts[0]) : 0; let [num, den] = fractionPart.split('/'); let dec = (parseFloat(num) || 0) / (parseFloat(den) || 1); return wholePart + dec;
-        }
-        return parseFloat(str) || 0;
+        
+        return parseSingle(str);
     }
 
     function formatPriceField(input) {
